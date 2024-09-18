@@ -43,7 +43,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
     var trackId = const Uuid().v4();
 
     var connectOptions = ConnectOptions(
-      'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiIsImN0eSI6InR3aWxpby1mcGE7dj0xIn0.eyJqdGkiOiJTSzJjMjZlYjA3Y2U4ZmI4NmU4NzFkOWU5YTQwNmUyODZlLTE3MjYwODkyMTAiLCJpc3MiOiJTSzJjMjZlYjA3Y2U4ZmI4NmU4NzFkOWU5YTQwNmUyODZlIiwic3ViIjoiQUNhMTgyNjAyYjMwN2M0ZDY5NDk1OWMyMzIzMjY0ZTcwOCIsImV4cCI6MTcyNjA5MjgxMCwiZ3JhbnRzIjp7ImlkZW50aXR5IjoiNjZlMjA3ZmE1MDIxYyIsInZpZGVvIjp7InJvb20iOiJURVNURVIifX19.Nl0WXfcO_fSRqZFaWDiFtgUykWRBwCcl7YUYAZiZtaI',
+      'token',
       roomName: 'TESTER',
       preferredAudioCodecs: [OpusCodec()],
       audioTracks: [LocalAudioTrack(true, 'audio_track-$trackId')],
