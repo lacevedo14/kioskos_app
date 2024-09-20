@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_videocall/models/entities/type_documents.dart';
+import 'package:flutter_videocall/models/services/services.dart';
 import 'package:flutter_videocall/models/services/typedocuments_service.dart';
+import 'package:flutter_videocall/providers/register_patient_providers.dart';
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
+import 'package:http/http.dart';
+import 'package:provider/provider.dart';
 
 const List<String> gender = <String>['Femenino', 'Masculino'];
 const List<String> codes = <String>['+1 EEUU', '+58 Venezuela', '+57 Colombia'];
@@ -27,7 +31,9 @@ class SignUp extends StatelessWidget {
               Text('Formulario de Registro',
                   style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 20),
-              MyCustomForm()
+              ChangeNotifierProvider(
+                  create: (_) => RegisterPatientProvider(),
+                  child: MyCustomForm())
             ],
           )),
           const SizedBox(height: 50),
@@ -58,9 +64,11 @@ class MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
+    final registerForm = Provider.of<RegisterPatientProvider>(context);
+    final patient = registerForm.patient;
     // Build a Form widget using the _formKey created above.
     return Form(
-        key: _formKey,
+        key: registerForm.registerKey,
         child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: SingleChildScrollView(
@@ -78,9 +86,11 @@ class MyCustomFormState extends State<MyCustomForm> {
                       labelText: 'Nombre',
                       hintText: 'Ingrese su Nombre',
                     ),
+                    onChanged: (value) => patient.firstName = value,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    onChanged: (value) => patient.lastName = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -108,7 +118,8 @@ class MyCustomFormState extends State<MyCustomForm> {
                                 value: value.id.toString(),
                                 child: Text(value.description));
                           }).toList(),
-                          onChanged: (String? value) {},
+                          onChanged: (String? value) =>
+                              patient.documentTypeId = value!,
                         );
                       } else if (snapshot.hasError) {
                         return Text('${snapshot.error}');
@@ -118,6 +129,8 @@ class MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    keyboardType: TextInputType.number,
+                    onChanged: (value) => patient.documentNumber = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -145,6 +158,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                   const SizedBox(height: 20),
                   TextFormField(
                     keyboardType: TextInputType.emailAddress,
+                    onChanged: (value) => patient.email = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -167,7 +181,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                       return DropdownMenuItem<String>(
                           value: value, child: Text(value));
                     }).toList(),
-                    onChanged: (String? value) {},
+                    onChanged: (String? value) => patient.gender = value!,
                   ),
                   const SizedBox(height: 20),
                   DropdownButtonFormField<String>(
@@ -180,10 +194,12 @@ class MyCustomFormState extends State<MyCustomForm> {
                       return DropdownMenuItem<String>(
                           value: value, child: Text(value));
                     }).toList(),
-                    onChanged: (String? value) {},
+                    onChanged: (String? value) => patient.codPhone = value!,
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
+                    keyboardType: TextInputType.phone,
+                    onChanged: (value) => patient.phone =value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter some text';
@@ -195,7 +211,21 @@ class MyCustomFormState extends State<MyCustomForm> {
                       labelText: 'Numero de Teléfono',
                     ),
                   ),
-                  SizedBox(height: 30),
+                  const SizedBox(height: 20),
+                  TextFormField(
+                    onChanged: (value) => patient.paymentCode = value,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter some text';
+                      }
+                      return null;
+                    },
+                    decoration: InputDecorations.authInputDecoration(
+                      hintText: 'Ingrese el Codigo de Pago',
+                      labelText: 'Codigo de Pago',
+                    ),
+                  ),
+                  const SizedBox(height: 30),
                   SizedBox(
                       width: double.infinity,
                       child: MaterialButton(
@@ -205,18 +235,16 @@ class MyCustomFormState extends State<MyCustomForm> {
                         elevation: 0,
                         color: Colors.deepPurple,
                         child: Container(
-                            padding: EdgeInsets.symmetric(
+                            padding: const EdgeInsets.symmetric(
                                 horizontal: 50, vertical: 15),
-                            child: Text(
+                            child: const Text(
                               'Enviar',
                               style: TextStyle(color: Colors.white),
                             )),
                         onPressed: () {
-                          if (_formKey.currentState!.validate()) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Processing Data')),
-                            );
-                          }
+                          if (!registerForm.isValidForm()) return;
+                          final loginService = LoginService();
+                          loginService.registerPatient(patient);
                         },
                       ))
                 ],

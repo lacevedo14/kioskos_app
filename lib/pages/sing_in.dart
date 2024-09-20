@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_videocall/models/services/typedocuments_service.dart';
 import 'package:flutter_videocall/models/entities/entities.dart';
+import 'package:flutter_videocall/pages/pages.dart';
 import 'package:flutter_videocall/providers/login_form_provider.dart';
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-final typedocumentdata = TypeDocumentsService();
 //final Future<TypeDocuments> list = typedocumentdata.getTypePRovider();
 
 const List<String> list1 = <String>['DNI', 'CE', 'PA'];
@@ -17,6 +17,7 @@ class SignIn extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const appTitle = 'Inicio de Sesion';
+
     return Scaffold(
         body: AuthBackground(
             child: SingleChildScrollView(
@@ -30,16 +31,17 @@ class SignIn extends StatelessWidget {
               Text('Login', style: Theme.of(context).textTheme.headlineMedium),
               const SizedBox(height: 30),
               ChangeNotifierProvider(
-                  create: (_) => LoginFormProvider(), child: MyCustomForm())
+                  create: (_) => LoginFormProvider(), child: MyLoginForm())
             ],
           )),
           const SizedBox(height: 50),
-          FloatingActionButton(
-            onPressed: () {
-              // Add your onPressed code here!
-            },
-            child: const Icon(Icons.add),
-          ),
+                        TextButton(
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () => context.go('/sign-up'),
+                child: const Text('Crear una nueva cuenta'),
+              ),
           const SizedBox(height: 50),
         ],
       ),
@@ -47,17 +49,18 @@ class SignIn extends StatelessWidget {
   }
 }
 
-class MyCustomForm extends StatefulWidget {
-  const MyCustomForm({super.key});
+class MyLoginForm extends StatefulWidget {
+  const MyLoginForm({super.key});
 
   @override
-  MyCustomFormState createState() {
-    return MyCustomFormState();
+  MyLoginFormState createState() {
+    return MyLoginFormState();
   }
 }
 
-class MyCustomFormState extends State<MyCustomForm> {
+class MyLoginFormState extends State<MyCustomForm> {
   String dropdownValue = '';
+  
   late Future<List<TypeDocuments>> list;
   @override
   void initState() {
@@ -67,6 +70,7 @@ class MyCustomFormState extends State<MyCustomForm> {
 
   @override
   Widget build(BuildContext context) {
+    //final loginService = Provider.of<LoginService>(context);
     final loginForm = Provider.of<LoginFormProvider>(context);
     // Build a Form widget using the _formKey created above.
     return Form(
@@ -92,7 +96,8 @@ class MyCustomFormState extends State<MyCustomForm> {
                             value: value.id.toString(),
                             child: Text(value.description));
                       }).toList(),
-                      onChanged: (String? value) {},
+                      onChanged: (String? value) =>
+                          loginForm.documentTypeId = value!,
                     );
                   } else if (snapshot.hasError) {
                     return Text('${snapshot.error}');
@@ -102,6 +107,7 @@ class MyCustomFormState extends State<MyCustomForm> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                onChanged: (value) => loginForm.documentNumber = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter some text';
@@ -115,6 +121,7 @@ class MyCustomFormState extends State<MyCustomForm> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                onChanged: (value) => loginForm.paymentCode = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter some text';
@@ -136,11 +143,11 @@ class MyCustomFormState extends State<MyCustomForm> {
                       elevation: 0,
                       color: Colors.deepPurple,
                       child: Container(
-                          padding: EdgeInsets.symmetric(
+                          padding: const EdgeInsets.symmetric(
                               horizontal: 50, vertical: 15),
                           child: Text(
                             loginForm.isLoading ? 'Espere' : 'Ingresar',
-                            style: TextStyle(color: Colors.white),
+                            style: const TextStyle(color: Colors.white),
                           )),
                       onPressed: loginForm.isLoading
                           ? null
@@ -148,19 +155,14 @@ class MyCustomFormState extends State<MyCustomForm> {
                               FocusScope.of(context).unfocus();
 
                               if (!loginForm.isValidForm()) return;
-
-                              final typedocumentdata = TypeDocumentsService();
-                              final Future<List<TypeDocuments>> list2 =
-                                  typedocumentdata.getTypePRovider();
-                              print(list2);
-                              print(list);
                               loginForm.isLoading = true;
-
-                              await Future.delayed(Duration(seconds: 2));
-
-                              // TODO: validar si el login es correcto
+                              //final Future<String> response = loginForm.loginUser();
+                              //final String response = await loginService.loginUser(loginForm);
+                              //print(response);
                               loginForm.isLoading = false;
-
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(content: Text('bien')),
+                              );
                               //Navigator.pushReplacementNamed(context, 'home');
                             }))
             ],

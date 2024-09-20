@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_videocall/pages/webrtc_room_page.dart';
+import 'package:go_router/go_router.dart';
 
 class EntryPage extends StatelessWidget {
   const EntryPage({super.key});
@@ -23,15 +24,16 @@ class EntryPage extends StatelessWidget {
                 style: ButtonStyle(
                   foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
                 ),
-                onPressed: () { 
-                  Navigator.of(context).push<MaterialPageRoute>(
-                    MaterialPageRoute(
-                      builder: (context) {
-                        return const CallScreen();
-                      },
-                    ),
-                  );
-                },
+                onPressed: () => context.go('/call-screen'),
+                // onPressed: () { 
+                //   Navigator.of(context).push<MaterialPageRoute>(
+                //     MaterialPageRoute(
+                //       builder: (context) {
+                //         return const CallScreen();
+                //       },
+                //     ),
+                //   );
+                // },
                 child: const Text('Enter'),
               ),
             ],
