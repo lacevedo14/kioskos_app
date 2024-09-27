@@ -7,7 +7,7 @@ class LoginFormProvider extends ChangeNotifier {
   
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  String documentTypeId    = '';
+  String documentTypeId  = '';
   String documentNumber = '';
   String paymentCode = '';
 

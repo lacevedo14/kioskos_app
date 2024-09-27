@@ -1,16 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_videocall/models/entities/type_documents.dart';
+import 'package:flutter_videocall/models/entities/entities.dart';
 import 'package:flutter_videocall/models/services/services.dart';
-import 'package:flutter_videocall/models/services/typedocuments_service.dart';
+import 'package:flutter_videocall/providers/patient_provider.dart';
 import 'package:flutter_videocall/providers/register_patient_providers.dart';
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
-import 'package:http/http.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-const List<String> gender = <String>['Femenino', 'Masculino'];
-const List<String> codes = <String>['+1 EEUU', '+58 Venezuela', '+57 Colombia'];
-final typedocumentdata = TypeDocumentsService();
+final apiService = ApiService();
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});
@@ -19,27 +17,37 @@ class SignUp extends StatelessWidget {
   Widget build(BuildContext context) {
     const appTitle = 'Formulario de Registro';
     return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+              onPressed: () => context.go('/'),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+        ),
         body: AuthBackground(
             child: SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 100),
-          CardContainer(
-              child: Column(
+          child: Column(
             children: [
-              const SizedBox(height: 10),
-              Text('Formulario de Registro',
-                  style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 20),
-              ChangeNotifierProvider(
-                  create: (_) => RegisterPatientProvider(),
-                  child: MyCustomForm())
+              const SizedBox(height: 100),
+              CardContainer(
+                  child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Text('Formulario de Registro',
+                      style: Theme.of(context).textTheme.headlineSmall),
+                  const SizedBox(height: 20),
+                  ChangeNotifierProvider(
+                      create: (_) => RegisterPatientProvider(),
+                      child: MyCustomForm())
+                ],
+              )),
+              const SizedBox(height: 50),
             ],
-          )),
-          const SizedBox(height: 50),
-        ],
-      ),
-    )));
+          ),
+        )));
   }
 }
 
@@ -53,20 +61,38 @@ class MyCustomForm extends StatefulWidget {
 }
 
 class MyCustomFormState extends State<MyCustomForm> {
-  final _formKey = GlobalKey<FormState>();
   String dropdownValue = '';
   late Future<List<TypeDocuments>> list;
+  late Future<List<Opcion>> gender;
+  late Future<List<CodePhone>> codes;
   @override
   void initState() {
     super.initState();
-    list = typedocumentdata.getTypePRovider();
+    list = apiService.getTypePRovider();
+    gender = apiService.getGender();
+    codes = apiService.getCodePhone();
+  }
+
+  _selectDate(BuildContext context) async {
+    final DateTime now = DateTime.now();
+    final DateTime lastYear = DateTime(now.year - 1);
+
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: now,
+      firstDate: lastYear,
+      lastDate: now,
+    );
+    if (picked != null) {
+      return picked;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     final registerForm = Provider.of<RegisterPatientProvider>(context);
+    final patientFinal = Provider.of<PatientProvider>(context);
     final patient = registerForm.patient;
-    // Build a Form widget using the _formKey created above.
     return Form(
         key: registerForm.registerKey,
         child: Padding(
@@ -78,7 +104,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                   TextFormField(
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Campo requerido';
                       }
                       return null;
                     },
@@ -93,7 +119,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                     onChanged: (value) => patient.lastName = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Campo requerido';
                       }
                       return null;
                     },
@@ -108,6 +134,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                     builder: (context, snapshot) {
                       if (snapshot.hasData) {
                         return DropdownButtonFormField<String>(
+                          isExpanded: true,
                           decoration: InputDecorations.authInputDecoration(
                             hintText: 'Seleccione su tipo Documento',
                             labelText: 'Tipo de Documento',
@@ -116,7 +143,10 @@ class MyCustomFormState extends State<MyCustomForm> {
                           items: snapshot.data!.map((value) {
                             return DropdownMenuItem<String>(
                                 value: value.id.toString(),
-                                child: Text(value.description));
+                                child: Text(
+                                  value.description,
+                                  overflow: TextOverflow.ellipsis,
+                                ));
                           }).toList(),
                           onChanged: (String? value) =>
                               patient.documentTypeId = value!,
@@ -133,7 +163,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                     onChanged: (value) => patient.documentNumber = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Ingrese un documento válido';
                       }
                       return null;
                     },
@@ -143,17 +173,39 @@ class MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  TextFormField(
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
-                      }
-                      return null;
+                  // TextButton(
+                  //     onPressed: () => _selectDate(context),
+                  //     child: Text('Fecha de Nacimiento')),
+                  // InputDatePickerFormField(
+                  //   keyboardType: TextInputType.datetime,
+                  //   fieldHintText: 'Fecha de Nacimiento',
+                  //   fieldLabelText: 'Fecha de Nacimiento',
+                  //   firstDate: DateTime(1910),
+                  //   lastDate: DateTime(2025),
+                  //   initialDate: DateTime.now(),
+                  //   autofocus: false,
+                  // ),
+                  GestureDetector(
+                    onTap: () {
+                      DateTime date = _selectDate(context);
+                      patient.birthDate = date;
                     },
-                    decoration: InputDecorations.authInputDecoration(
-                      hintText: 'Fecha de Nacimiento',
-                      labelText: 'Fecha de Nacimiento',
-                    ),
+                    child: AbsorbPointer(
+                        child: TextFormField(
+                      keyboardType: TextInputType.datetime,
+                      onChanged: (value) =>
+                          patient.birthDate = value as DateTime?,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Ingrese un Fecha válida';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecorations.authInputDecoration(
+                        hintText: 'Fecha de Nacimiento',
+                        labelText: 'Fecha de Nacimiento',
+                      ),
+                    )),
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -161,7 +213,9 @@ class MyCustomFormState extends State<MyCustomForm> {
                     onChanged: (value) => patient.email = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value!)) {
+                          return 'Ingrese un correo válido';
+                        }
                       }
                       return null;
                     },
@@ -171,38 +225,69 @@ class MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecorations.authInputDecoration(
-                      hintText: 'Seleccione su Genero',
-                      labelText: 'Genero',
-                    ),
-                    value: null,
-                    items: gender.map((value) {
-                      return DropdownMenuItem<String>(
-                          value: value, child: Text(value));
-                    }).toList(),
-                    onChanged: (String? value) => patient.gender = value!,
+                  FutureBuilder(
+                    future: gender,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          decoration: InputDecorations.authInputDecoration(
+                            hintText: 'Seleccione su Genero',
+                            labelText: 'Genero',
+                          ),
+                          value: null,
+                          items: snapshot.data!.map((value) {
+                            return DropdownMenuItem<String>(
+                                value: value.id,
+                                child: Text(
+                                  value.description,
+                                  overflow: TextOverflow.ellipsis,
+                                ));
+                          }).toList(),
+                          onChanged: (String? value) => patient.gender = value!,
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      }
+                      return const CircularProgressIndicator();
+                    },
                   ),
                   const SizedBox(height: 20),
-                  DropdownButtonFormField<String>(
-                    decoration: InputDecorations.authInputDecoration(
-                      hintText: 'Seleccione su Codigo de Telefono',
-                      labelText: 'Codigo de Telefono',
-                    ),
-                    value: null,
-                    items: codes.map((value) {
-                      return DropdownMenuItem<String>(
-                          value: value, child: Text(value));
-                    }).toList(),
-                    onChanged: (String? value) => patient.codPhone = value!,
+                  FutureBuilder(
+                    future: codes,
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData) {
+                        return DropdownButtonFormField<String>(
+                          isExpanded: true,
+                          decoration: InputDecorations.authInputDecoration(
+                            hintText: 'Seleccione su Codigo de Telefono',
+                            labelText: 'Codigo de Telefono',
+                          ),
+                          value: null,
+                          items: snapshot.data!.map((value) {
+                            return DropdownMenuItem<String>(
+                                value: value.codPhone,
+                                child: Text(
+                                  '${value.codPhone} ${value.description}',
+                                  overflow: TextOverflow.ellipsis,
+                                ));
+                          }).toList(),
+                          onChanged: (String? value) =>
+                              patient.codPhone = value!,
+                        );
+                      } else if (snapshot.hasError) {
+                        return Text('${snapshot.error}');
+                      }
+                      return const CircularProgressIndicator();
+                    },
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
                     keyboardType: TextInputType.phone,
-                    onChanged: (value) => patient.phone =value,
+                    onChanged: (value) => patient.phone = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Campo requerido';
                       }
                       return null;
                     },
@@ -216,7 +301,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                     onChanged: (value) => patient.paymentCode = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter some text';
+                        return 'Campo requerido';
                       }
                       return null;
                     },
@@ -226,27 +311,45 @@ class MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                  SizedBox(
-                      width: double.infinity,
-                      child: MaterialButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        disabledColor: Colors.grey,
-                        elevation: 0,
-                        color: Colors.deepPurple,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
-                            child: const Text(
-                              'Enviar',
-                              style: TextStyle(color: Colors.white),
-                            )),
-                        onPressed: () {
-                          if (!registerForm.isValidForm()) return;
-                          final loginService = LoginService();
-                          loginService.registerPatient(patient);
-                        },
-                      ))
+                           SizedBox(
+                  width: double.infinity,
+                  child: MaterialButton(
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10)),
+                      disabledColor: Colors.grey,
+                      elevation: 0,
+                      color: Colors.indigo,
+                      onPressed: registerForm.isLoading
+                          ? null
+                          : () async {
+                              FocusScope.of(context).unfocus();
+
+                              if (!registerForm.isValidForm()) return;
+                                registerForm.isLoading = true;
+                                final loginService = LoginService();
+                                //final Future<String> response = registerForm.loginUser();
+                                Map response =
+                                    await loginService.registerPatient(registerForm);
+                                    registerForm.isLoading = false;
+                                if (response['success']) {
+                                  patientFinal.patient = response['patient'];
+                                  context.go('/entry-page');
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(response['message'])),
+                                  );
+                              }
+                              //print(response);
+                              registerForm.isLoading = false;
+                              //Navigator.pushReplacementNamed(context, 'home');
+                            },
+                      child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                          child: Text(
+                            registerForm.isLoading ? 'Espere' : 'Enviar',
+                            style: const TextStyle(color: Colors.white),
+                          ))))
                 ],
               ),
             )));

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class AuthBackground extends StatelessWidget {
   final Widget child;
@@ -8,12 +9,12 @@ class AuthBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      // color: Colors.red,
+      // color: Colors.red,3
       width: double.infinity,
       height: double.infinity,
       child: Stack(
         children: [
-          _PurpleBox(),
+          _colorBox(),
           _HeaderIcon(),
           this.child,
         ],
@@ -28,16 +29,21 @@ class _HeaderIcon extends StatelessWidget {
     return SafeArea(
       child: Container(
         width: double.infinity,
-        margin: EdgeInsets.only(top: 20),
-        child: const FlutterLogo(
-          size: 50,
-        ),
+        margin: const EdgeInsets.only(top: 30),
+        child:  ClipRRect(
+          child:SvgPicture.asset('assets/logo-elite-footer.svg',colorFilter:const ColorFilter.mode(Colors.white, BlendMode.srcIn),),
+        )
+        // Container(
+        //   decoration: const BoxDecoration(
+        //     image: DecorationImage(image: AssetImage('assets/logo_egd.png'),fit: BoxFit.scaleDown)
+        //   ),
+        // ),
       ),
     );
   }
 }
 
-class _PurpleBox extends StatelessWidget {
+class _colorBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
@@ -45,7 +51,7 @@ class _PurpleBox extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: size.height * 0.4,
-      decoration: _purpleBackground(),
+      decoration: _background(),
       child: Stack(
         children: [
           Positioned(child: _Bubble(), top: 90, left: 30),
@@ -58,10 +64,10 @@ class _PurpleBox extends StatelessWidget {
     );
   }
 
-  BoxDecoration _purpleBackground() => BoxDecoration(
+  BoxDecoration _background() => const BoxDecoration(
           gradient: LinearGradient(colors: [
-        Color.fromRGBO(63, 63, 156, 1),
-        Color.fromRGBO(90, 70, 178, 1)
+              Color(0xFF3598dc),
+              Color(0xff3d85c6),
       ]));
 }
 

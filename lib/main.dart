@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/config/router/app_router.dart';
+import 'package:flutter_videocall/providers/patient_provider.dart';
 import 'package:flutter_videocall/providers/register_patient_providers.dart';
-import 'package:provider/provider.dart' as Providers;
+import 'package:provider/provider.dart' as providers;
 import 'package:flutter_videocall/models/services/services.dart';
 
 import 'package:provider/provider.dart';
@@ -12,12 +13,14 @@ void main() {
     ProviderScope(
       child: MultiProvider(
         providers: [
-          Providers.ChangeNotifierProvider(create: (_) => LoginService()),
-          Providers.ChangeNotifierProvider(
-              create: (_) => RegisterPatientProvider())
+          providers.ChangeNotifierProvider(create: (_) => LoginService()),
+          providers.ChangeNotifierProvider(
+              create: (_) => RegisterPatientProvider()),
+          providers.ChangeNotifierProvider(
+              create: (_) => PatientProvider())
         ],
         child: const MaterialApp(
-          debugShowCheckedModeBanner: false,
+           debugShowCheckedModeBanner: false,
           home: MainApp(),
         ),
       ),
@@ -31,8 +34,8 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
-      routerConfig: appRouter,
       debugShowCheckedModeBanner: false,
+      routerConfig: appRouter,
     );
   }
 }

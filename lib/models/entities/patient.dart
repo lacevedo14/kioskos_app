@@ -1,20 +1,14 @@
-import 'dart:convert';
-
-Patient patientFromJson(String str) => Patient.fromJson(json.decode(str));
-
-String patientToJson(Patient data) => json.encode(data.toJson());
-
 class Patient {
-    int id;
+    String id;
     String patientName;
 
     Patient({
-        required this.id,
-        required this.patientName,
+        this.id = '',
+        this.patientName = '' ,
     });
 
-    factory Patient.fromJson(Map<String, dynamic> json) => Patient(
-        id: json["id"],
+     factory Patient.fromJson(Map<String, dynamic> json) => Patient(
+        id: json["id"].toString(),
         patientName: json["patient_name"],
     );
 

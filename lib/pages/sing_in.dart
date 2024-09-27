@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_videocall/models/entities/entities.dart';
+import 'package:flutter_videocall/models/services/login_service.dart';
 import 'package:flutter_videocall/pages/pages.dart';
 import 'package:flutter_videocall/providers/login_form_provider.dart';
+import 'package:flutter_videocall/providers/patient_provider.dart';
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
@@ -35,13 +37,13 @@ class SignIn extends StatelessWidget {
             ],
           )),
           const SizedBox(height: 50),
-                        TextButton(
-                style: ButtonStyle(
-                  foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
-                ),
-                onPressed: () => context.go('/sign-up'),
-                child: const Text('Crear una nueva cuenta'),
-              ),
+          TextButton(
+            style: ButtonStyle(
+              foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+            ),
+            onPressed: () => context.go('/sign-up'),
+            child: const Text('Crear una nueva cuenta'),
+          ),
           const SizedBox(height: 50),
         ],
       ),
@@ -58,20 +60,21 @@ class MyLoginForm extends StatefulWidget {
   }
 }
 
-class MyLoginFormState extends State<MyCustomForm> {
+class MyLoginFormState extends State<MyLoginForm> {
   String dropdownValue = '';
-  
+
   late Future<List<TypeDocuments>> list;
   @override
   void initState() {
     super.initState();
-    list = typedocumentdata.getTypePRovider();
+    list = apiService.getTypePRovider();
   }
 
   @override
   Widget build(BuildContext context) {
-    //final loginService = Provider.of<LoginService>(context);
+    final loginService = Provider.of<LoginService>(context);
     final loginForm = Provider.of<LoginFormProvider>(context);
+    final patient = Provider.of<PatientProvider>(context);
     // Build a Form widget using the _formKey created above.
     return Form(
         key: loginForm.formKey,
@@ -86,6 +89,7 @@ class MyLoginFormState extends State<MyCustomForm> {
                 builder: (context, snapshot) {
                   if (snapshot.hasData) {
                     return DropdownButtonFormField<String>(
+                      isExpanded: true,
                       decoration: InputDecorations.authInputDecoration(
                         hintText: 'Seleccione su tipo Documento',
                         labelText: 'Tipo de Documento',
@@ -94,7 +98,8 @@ class MyLoginFormState extends State<MyCustomForm> {
                       items: snapshot.data!.map((value) {
                         return DropdownMenuItem<String>(
                             value: value.id.toString(),
-                            child: Text(value.description));
+                            child: Text(value.description,
+                                overflow: TextOverflow.ellipsis));
                       }).toList(),
                       onChanged: (String? value) =>
                           loginForm.documentTypeId = value!,
@@ -107,10 +112,11 @@ class MyLoginFormState extends State<MyCustomForm> {
               ),
               const SizedBox(height: 20),
               TextFormField(
+                keyboardType: TextInputType.number,
                 onChanged: (value) => loginForm.documentNumber = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
+                    return 'Campo requerido';
                   }
                   return null;
                 },
@@ -124,7 +130,7 @@ class MyLoginFormState extends State<MyCustomForm> {
                 onChanged: (value) => loginForm.paymentCode = value,
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter some text';
+                    return 'Campo requerido';
                   }
                   return null;
                 },
@@ -133,7 +139,7 @@ class MyLoginFormState extends State<MyCustomForm> {
                   labelText: 'Codigo de Pago',
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 30),
               SizedBox(
                   width: double.infinity,
                   child: MaterialButton(
@@ -141,30 +147,37 @@ class MyLoginFormState extends State<MyCustomForm> {
                           borderRadius: BorderRadius.circular(10)),
                       disabledColor: Colors.grey,
                       elevation: 0,
-                      color: Colors.deepPurple,
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
-                          child: Text(
-                            loginForm.isLoading ? 'Espere' : 'Ingresar',
-                            style: const TextStyle(color: Colors.white),
-                          )),
+                      color: Colors.indigo,
                       onPressed: loginForm.isLoading
                           ? null
                           : () async {
                               FocusScope.of(context).unfocus();
 
                               if (!loginForm.isValidForm()) return;
-                              loginForm.isLoading = true;
-                              //final Future<String> response = loginForm.loginUser();
-                              //final String response = await loginService.loginUser(loginForm);
+                                loginForm.isLoading = true;
+                                //final Future<String> response = loginForm.loginUser();
+                                Map response =
+                                    await loginService.loginUser(loginForm);
+                                    loginForm.isLoading = false;
+                                if (response['success']) {
+                                  patient.patient = response['patient'];
+                                  context.go('/entry-page');
+                                } else {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(content: Text(response['message'])),
+                                  );
+                              }
                               //print(response);
                               loginForm.isLoading = false;
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text('bien')),
-                              );
                               //Navigator.pushReplacementNamed(context, 'home');
-                            }))
+                            },
+                      child: Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 50, vertical: 15),
+                          child: Text(
+                            loginForm.isLoading ? 'Espere' : 'Ingresar',
+                            style: const TextStyle(color: Colors.white),
+                          ))))
             ],
           ),
         ));
