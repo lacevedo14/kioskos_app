@@ -16,12 +16,16 @@ void main() {
           providers.ChangeNotifierProvider(create: (_) => LoginService()),
           providers.ChangeNotifierProvider(
               create: (_) => RegisterPatientProvider()),
-          providers.ChangeNotifierProvider(
-              create: (_) => PatientProvider())
+          providers.ChangeNotifierProvider(create: (_) => PatientProvider())
         ],
-        child: const MaterialApp(
-           debugShowCheckedModeBanner: false,
-          home: MainApp(),
+        child: MaterialApp(
+          debugShowCheckedModeBanner: false,
+          home: const MainApp(),
+          theme: ThemeData(
+            colorScheme: ColorScheme.fromSeed(
+              seedColor: Colors.indigo,
+            ),
+          ),
         ),
       ),
     ),

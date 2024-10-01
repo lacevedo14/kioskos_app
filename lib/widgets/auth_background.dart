@@ -28,17 +28,19 @@ class _HeaderIcon extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Container(
-        width: double.infinity,
-        margin: const EdgeInsets.only(top: 30),
-        child:  ClipRRect(
-          child:SvgPicture.asset('assets/logo-elite-footer.svg',colorFilter:const ColorFilter.mode(Colors.white, BlendMode.srcIn),),
-        )
-        // Container(
-        //   decoration: const BoxDecoration(
-        //     image: DecorationImage(image: AssetImage('assets/logo_egd.png'),fit: BoxFit.scaleDown)
-        //   ),
-        // ),
-      ),
+          width: double.infinity,
+          margin: const EdgeInsets.only(top: 70),
+          child: ClipRRect(
+            child: SvgPicture.asset('assets/logo-elite-footer.svg',
+                colorFilter:
+                    const ColorFilter.mode(Colors.white, BlendMode.srcIn)),
+          )
+          // Container(
+          //   decoration: const BoxDecoration(
+          //     image: DecorationImage(image: AssetImage('assets/logo_egd.png'),fit: BoxFit.scaleDown)
+          //   ),
+          // ),
+          ),
     );
   }
 }
@@ -66,8 +68,8 @@ class _colorBox extends StatelessWidget {
 
   BoxDecoration _background() => const BoxDecoration(
           gradient: LinearGradient(colors: [
-              Color(0xFF3598dc),
-              Color(0xff3d85c6),
+        Color(0xFF3598dc),
+        Color(0xff3d85c6),
       ]));
 }
 

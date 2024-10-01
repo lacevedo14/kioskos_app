@@ -15,7 +15,7 @@ class SignUp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    const appTitle = 'Formulario de Registro';
+    const appTitle = 'Registro';
     return Scaffold(
         extendBodyBehindAppBar: true,
         appBar: AppBar(
@@ -36,7 +36,7 @@ class SignUp extends StatelessWidget {
                   child: Column(
                 children: [
                   const SizedBox(height: 10),
-                  Text('Formulario de Registro',
+                  Text('Registro',
                       style: Theme.of(context).textTheme.headlineSmall),
                   const SizedBox(height: 20),
                   ChangeNotifierProvider(

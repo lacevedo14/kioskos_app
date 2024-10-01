@@ -22,15 +22,18 @@ final initRemote = CallState(
 
 class CallStateNotifier extends StateNotifier<VideoCall> {
   CallStateNotifier()
-      : super(
-            VideoCall(localVideoInfo: initLocal, remoteVideoInfo: initRemote)) {
+      : super(VideoCall(
+            localVideoInfo: initLocal,
+            remoteVideoInfo: initRemote,
+            finishCall: false,
+            audioSetting: true)) {
     debugPrint('$tag: initialized');
     initializeWebRtc();
   }
 
   static const tag = 'WebRtcController';
   bool speakerphoneEnabled = true;
-  bool bluetoothPreferred = true;
+  bool bluetoothPreferred = false;
   late CameraCapturer _cameraCapturer;
   late Room _room;
 
@@ -44,7 +47,9 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
     _cameraCapturer = CameraCapturer(
       sources.firstWhere((source) => source.isFrontFacing),
     );
-    //await TwilioProgrammableVideo.setAudioSettings(speakerphoneEnabled: speakerphoneEnabled, bluetoothPreferred: bluetoothPreferred);
+    await TwilioProgrammableVideo.setAudioSettings(
+        speakerphoneEnabled: speakerphoneEnabled,
+        bluetoothPreferred: bluetoothPreferred);
 
     var trackId = const Uuid().v4();
     final dataAppoiment = await apiService.getRoom(state.getIdPatient);
@@ -72,7 +77,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
       if (_room != null) {
         _room.onConnected.listen(_onConnected);
         _room.onConnectFailure.listen(_onConnectFailure);
-        _room.onParticipantDisconnected.listen(_onParticipantDisconnected);
+        _room.onDisconnected.listen(_onDisconnected);
       }
 
       // _room.onConnected.listen(_onConnected);
@@ -82,11 +87,17 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
   Future<void> disconnect() async {
     log('[ APPDEBUG ] ConferenceRoom.disconnect()');
+    await TwilioProgrammableVideo.disableAudioSettings();
     await _room.disconnect();
   }
 
   void _onDisconnected(RoomDisconnectedEvent event) {
-    log('[ APPDEBUG ] ConferenceRoom._onDisconnected');
+    log('[ APPDEBUG ] ConferenceRoom._onDisconnected  ${event.room.name}');
+    state = VideoCall.copyWith(
+        localVideoInfo: initLocal,
+        remoteVideoInfo: initRemote,
+        audioSetting: false,
+        finishCall: true);
   }
 
   void _onReconnecting(RoomReconnectingEvent room) {
@@ -100,17 +111,24 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
         room.localParticipant?.localVideoTracks[0].localVideoTrack;
 
     final localWidget = localTrack?.widget();
+    final tracks = room.localParticipant?.localAudioTracks ?? [];
+
+    final localAudioTrack = tracks.isEmpty ? null : tracks[0].localAudioTrack;
 
     state = VideoCall.copyWith(
         localVideoInfo: CallState(
             isCalling: true,
-            id: _room.localParticipant!.identity,
-            widget: localWidget),
-        remoteVideoInfo: initRemote);
+            id: room.localParticipant!.identity,
+            widget: localWidget,
+            networkLevel: room.localParticipant!.networkQualityLevel.index),
+        remoteVideoInfo: initRemote,
+        audioSetting: localAudioTrack!.isEnabled,
+        finishCall: false);
 
     final localParticipant = room.localParticipant;
     //final remoteParticipant = room.remoteParticipants[0];
     room.onParticipantConnected.listen(_onParticipantConnected);
+    room.onParticipantDisconnected.listen(_onParticipantDisconnected);
 
     if (localParticipant == null) {
       log('[ APPDEBUG ] ConferenceRoom._onConnected => localParticipant is null');
@@ -128,11 +146,13 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
             final id = event.remoteParticipant.identity;
             state = VideoCall.copyWith(
               localVideoInfo: state.localVideoInfo,
+              audioSetting: state.audioSetting,
+              finishCall: false,
               remoteVideoInfo: CallState(
-                isCalling: true,
-                id: id,
-                widget: widget,
-              ),
+                  isCalling: true,
+                  id: id,
+                  widget: widget,
+                  networkLevel: remoteParticipant.networkQualityLevel.index),
             );
           },
         );
@@ -156,11 +176,13 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
         final id = event.remoteParticipant.identity;
         state = VideoCall.copyWith(
           localVideoInfo: state.localVideoInfo,
+          audioSetting: state.audioSetting,
+          finishCall: false,
           remoteVideoInfo: CallState(
-            isCalling: true,
-            id: id,
-            widget: widget,
-          ),
+              isCalling: true,
+              id: id,
+              widget: widget,
+              networkLevel: event.remoteParticipant.networkQualityLevel.index),
         );
       },
     );
@@ -168,11 +190,15 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   }
 
   void _onParticipantDisconnected(RoomParticipantDisconnectedEvent event) {
+    log('Participant ${event.remoteParticipant.identity} has left the room');
     state = VideoCall.copyWith(
-        localVideoInfo: initLocal, remoteVideoInfo: initRemote);
+        localVideoInfo: initLocal,
+        remoteVideoInfo: initRemote,
+        finishCall: true,
+        audioSetting: false);
   }
 
-  Future<void> toggleAudioEnabled() async {
+  void toggleAudioEnabled() async {
     final tracks = _room.localParticipant?.localAudioTracks ?? [];
     final localAudioTrack = tracks.isEmpty ? null : tracks[0].localAudioTrack;
     if (localAudioTrack == null) {
@@ -180,5 +206,10 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
       return;
     }
     await localAudioTrack.enable(!localAudioTrack.isEnabled);
+    state = VideoCall.copyWith(
+        localVideoInfo: state.localVideoInfo,
+        remoteVideoInfo: state.remoteVideoInfo,
+        finishCall: false,
+        audioSetting: localAudioTrack.isEnabled);
   }
 }
