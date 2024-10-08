@@ -11,7 +11,7 @@ class Home extends StatelessWidget {
         body: AuthBackground(
             child: SingleChildScrollView(
       child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 30, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
         child: Column(
           children: [
             const SizedBox(height: 400),
@@ -50,6 +50,25 @@ class Home extends StatelessWidget {
                       )),
                   onPressed: () => context.go('/sign-up'),
                 )),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: double.infinity,
+              child: MaterialButton(
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10)),
+                disabledColor: Colors.grey,
+                elevation: 0,
+                color: Colors.indigo,
+                child: Container(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 50, vertical: 15),
+                    child: const Text(
+                      'Scan Facial',
+                      style: TextStyle(color: Colors.white),
+                    )),
+                onPressed: () => context.go('/facial-scan'),
+              ),
+            ),
           ],
         ),
       ),

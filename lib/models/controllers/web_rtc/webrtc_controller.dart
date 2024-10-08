@@ -47,9 +47,9 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
     _cameraCapturer = CameraCapturer(
       sources.firstWhere((source) => source.isFrontFacing),
     );
-    await TwilioProgrammableVideo.setAudioSettings(
-        speakerphoneEnabled: speakerphoneEnabled,
-        bluetoothPreferred: bluetoothPreferred);
+    // await TwilioProgrammableVideo.setAudioSettings(
+    //     speakerphoneEnabled: speakerphoneEnabled,
+    //     bluetoothPreferred: bluetoothPreferred);
 
     var trackId = const Uuid().v4();
     final dataAppoiment = await apiService.getRoom(state.getIdPatient);
@@ -177,7 +177,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
         state = VideoCall.copyWith(
           localVideoInfo: state.localVideoInfo,
           audioSetting: state.audioSetting,
-          finishCall: false,
+            finishCall: false,
           remoteVideoInfo: CallState(
               isCalling: true,
               id: id,

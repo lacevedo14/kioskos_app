@@ -28,6 +28,10 @@ final appRouter = GoRouter(
       path: '/call-screen',
       builder: (context, state) => const CallScreen(),
     ),
+    GoRoute(
+      path: '/facial-scan',
+      builder: (context, state) => const MeasurementScreen(),
+    ),
 
   ]
 );

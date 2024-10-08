@@ -12,10 +12,10 @@ class CallScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final callState = ref.watch(callStateProvider);
     final patientForm = providers.Provider.of<PatientProvider>(context);
-    if (callState.finishCall) {
-      context.go('/');
-    }
     ref.read(callStateProvider).idPatient = patientForm.patient!.id as String?;
+    if (callState.finishCall) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/'));
+    }
     return Scaffold(
       appBar: null,
       body: Column(
