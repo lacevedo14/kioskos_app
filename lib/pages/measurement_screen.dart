@@ -2,13 +2,20 @@ import 'package:binah_flutter_sdk/session/session_state.dart';
 import 'package:binah_flutter_sdk/ui/camera_preview_view.dart';
 import 'package:binah_flutter_sdk/images/image_data.dart' as sdk_image_data;
 import 'package:flutter/material.dart';
+import 'package:flutter_videocall/models/services/api_service.dart';
+import 'package:flutter_videocall/ui/custom_button.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:focus_detector/focus_detector.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/scheduler.dart';
-import 'package:flutter_videocall/models/facial_scan/measurement_model.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter_videocall/models/models.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
-import 'package:flutter_videocall/ui/custom_button.dart';
+import 'results_screen.dart';
+import 'translations.dart';
 import 'dart:async';
+import 'device_info_storage.dart';
 
 class MeasurementScreen extends StatefulWidget {
   const MeasurementScreen({Key? key}) : super(key: key);
@@ -19,12 +26,13 @@ class MeasurementScreen extends StatefulWidget {
 
 class _MeasurementScreenState extends State<MeasurementScreen> {
   String _selectedLanguage = 'ESP';
-
+  SharedPreferencesAsync prefs = SharedPreferencesAsync();
+    final ApiService _apiService = ApiService(); 
   @override
   void initState() {
     super.initState();
     print('DEBUG: MeasurementScreen: initState llamado'); // DEBUG
-    //_loadLanguagePreference();
+    _loadLanguagePreference();
 
     // Reiniciamos los resultados previos al entrar en la pantalla
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -33,26 +41,31 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
     });
   }
 
-  // Future<void> _loadLanguagePreference() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   setState(() {
-  //     _selectedLanguage = prefs.getString('selectedLanguage') ?? 'ESP';
-  //     print('DEBUG: MeasurementScreen: Idioma cargado - $_selectedLanguage'); // DEBUG
-  //   });
-  // }
+  Future<void> _loadLanguagePreference() async {
+    _selectedLanguage = await prefs.getString('selectedLanguage') ?? 'ESP';
+  }
 
   @override
   Widget build(BuildContext context) {
-    var warning = context.select<MeasurementModel, String?>((model) => model.warning);
-    var error = context.select<MeasurementModel, String?>((model) => model.error);
-    var bloodPressure = context.select<MeasurementModel, String?>((model) => model.finalResultsString);
+    var warning =
+        context.select<MeasurementModel, String?>((model) => model.warning);
+    var error =
+        context.select<MeasurementModel, String?>((model) => model.error);
+    var bloodPressure = context
+        .select<MeasurementModel, String?>((model) => model.finalResultsString);
 
     print('DEBUG: MeasurementScreen: build llamado'); // DEBUG
     print('DEBUG: MeasurementScreen: warning = $warning'); // DEBUG
     print('DEBUG: MeasurementScreen: error = $error'); // DEBUG
     print('DEBUG: MeasurementScreen: bloodPressure = $bloodPressure'); // DEBUG
 
- 
+    if (warning != null) {
+      Fluttertoast.showToast(
+          msg: warning,
+          toastLength: Toast.LENGTH_SHORT,
+          textColor: Colors.white);
+      print('DEBUG: MeasurementScreen: Mostrando toast de warning'); // DEBUG
+    }
 
     if (error != null) {
       showAlert(context, "Error", error);
@@ -61,7 +74,8 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 
     if (bloodPressure != null) {
       showAlert(context, "Results", bloodPressure);
-      print('DEBUG: MeasurementScreen: Mostrando alerta de resultados'); // DEBUG
+      print(
+          'DEBUG: MeasurementScreen: Mostrando alerta de resultados'); // DEBUG
     }
 
     bool isDark = Theme.of(context).brightness == Brightness.dark;
@@ -76,9 +90,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         context.read<MeasurementModel>().screenInFocus(true);
       },
       child: Scaffold(
-        backgroundColor: isDark
-            ? const Color(0xFF171f2c)
-            : const Color(0xFFffffff),
+        backgroundColor: Color.fromARGB(255, 195, 198, 202),
         appBar: PreferredSize(
           preferredSize: Size.fromHeight(60.0),
           child: AppBar(
@@ -98,7 +110,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                     ),
                     const SizedBox(height: 3),
                     Text(
-                      'face_scan',
+                      translations[_selectedLanguage]!['face_scan']!,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 14,
@@ -125,15 +137,15 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 5),
-                      color: isDark
-                          ? Color(0xFF171f2c).withOpacity(0.5)
-                          : Color(0xFFffffff).withOpacity(0.5),
+                      color:
+                          Color.fromARGB(255, 195, 198, 202).withOpacity(0.5),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           const _PulseRate(),
                           const SizedBox(height: 5),
-                          _StartStopButtonWithTimer(selectedLanguage: _selectedLanguage),
+                          _StartStopButtonWithTimer(
+                              selectedLanguage: _selectedLanguage),
                         ],
                       ),
                     ),
@@ -147,8 +159,9 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
     );
   }
 
-  void showAlert(BuildContext context, String? title, String results) {
-    print('DEBUG: MeasurementScreen: showAlert llamado con title="$title" y results="$results"'); // DEBUG
+  Future<void> showAlert(BuildContext context, String? title, String results) async {
+    print(
+        'DEBUG: MeasurementScreen: showAlert llamado con title="$title" y results="$results"'); // DEBUG
 
     List<Map<String, String>> parsedResults;
 
@@ -169,15 +182,20 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         }
         return {'mainText': 'N/A', 'subtitleText': parts[0]};
       }).toList();
-      print('DEBUG: MeasurementScreen: Parsed Results - $parsedResults'); // DEBUG
+      print(
+          'DEBUG: MeasurementScreen: Parsed Results - $parsedResults');
+           var idScan = await prefs.getInt('idScan') ?? '';
+          final data = await _apiService.sendResultScan(idScan,parsedResults); // DEBUG
     }
-
+ 
     SchedulerBinding.instance.addPostFrameCallback((_) {
-      print('DEBUG: MeasurementScreen: Navegando a ResultsScreen'); // DEBUG
+      print('DEBUG: MeasurementScreen: Navegando a ResultsScreen');
+      context.go('/entry-page');
       // Navigator.push(
       //   context,
       //   MaterialPageRoute(
-      //     builder: (context) => ResultsScreen(results: parsedResults, title: title),
+      //     builder: (context) =>
+      //         ResultsScreen(results: parsedResults, title: title),
       //   ),
       // );
     });
@@ -187,10 +205,12 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
 class _StartStopButtonWithTimer extends StatefulWidget {
   final String selectedLanguage;
 
-  const _StartStopButtonWithTimer({Key? key, required this.selectedLanguage}) : super(key: key);
+  const _StartStopButtonWithTimer({Key? key, required this.selectedLanguage})
+      : super(key: key);
 
   @override
-  _StartStopButtonWithTimerState createState() => _StartStopButtonWithTimerState();
+  _StartStopButtonWithTimerState createState() =>
+      _StartStopButtonWithTimerState();
 }
 
 class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
@@ -207,7 +227,8 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
     Future.delayed(Duration(seconds: 3), () {
       setState(() {
         _isButtonEnabled = true;
-        print('DEBUG: _StartStopButtonWithTimerState: _isButtonEnabled establecido a true'); // DEBUG
+        print(
+            'DEBUG: _StartStopButtonWithTimerState: _isButtonEnabled establecido a true'); // DEBUG
       });
     });
   }
@@ -221,11 +242,13 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       setState(() {
         _startTime++;
-        print('DEBUG: _StartStopButtonWithTimerState: _startTime = $_startTime'); // DEBUG
+        print(
+            'DEBUG: _StartStopButtonWithTimerState: _startTime = $_startTime'); // DEBUG
       });
 
       if (_startTime >= _endTime) {
-        print('DEBUG: _StartStopButtonWithTimerState: Tiempo finalizado, deteniendo timer y simulando pulsación de detener'); // DEBUG
+        print(
+            'DEBUG: _StartStopButtonWithTimerState: Tiempo finalizado, deteniendo timer y simulando pulsación de detener'); // DEBUG
         _stopTimer();
         _simulateStopButtonPress();
       }
@@ -244,15 +267,19 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
   }
 
   void _simulateStopButtonPress() {
-    var measurementModel = Provider.of<MeasurementModel>(context, listen: false);
-    print('DEBUG: _StartStopButtonWithTimerState: Simulando pulsación de botón de detener'); // DEBUG
+    var measurementModel =
+        Provider.of<MeasurementModel>(context, listen: false);
+    print(
+        'DEBUG: _StartStopButtonWithTimerState: Simulando pulsación de botón de detener'); // DEBUG
     measurementModel.startStopButtonClicked();
   }
 
   @override
   Widget build(BuildContext context) {
-    var state = context.select<MeasurementModel, SessionState?>((model) => model.sessionState);
-    print('DEBUG: _StartStopButtonWithTimerState: build llamado con state = $state'); // DEBUG
+    var state = context
+        .select<MeasurementModel, SessionState?>((model) => model.sessionState);
+    print(
+        'DEBUG: _StartStopButtonWithTimerState: build llamado con state = $state'); // DEBUG
 
     return Column(
       children: [
@@ -261,8 +288,8 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
           child: CustomButton(
             width: 279,
             text: state == SessionState.processing
-                ? 'stop'
-                : 'start_button',
+                ? translations[widget.selectedLanguage]!['stop']!
+                : translations[widget.selectedLanguage]!['start_button']!,
             margin: const EdgeInsets.symmetric(horizontal: 24, vertical: 5),
             alignment: Alignment.center,
             variant: ButtonVariant.FillCustomColor,
@@ -270,19 +297,24 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
             padding: ButtonPadding.PaddingAll12,
             onTap: _isButtonEnabled
                 ? () {
-              print('DEBUG: _StartStopButtonWithTimerState: Botón presionado'); // DEBUG
-              var measurementModel = Provider.of<MeasurementModel>(context, listen: false);
-              measurementModel.startStopButtonClicked();
-              print('DEBUG: _StartStopButtonWithTimerState: startStopButtonClicked llamado'); // DEBUG
+                    print(
+                        'DEBUG: _StartStopButtonWithTimerState: Botón presionado'); // DEBUG
+                    var measurementModel =
+                        Provider.of<MeasurementModel>(context, listen: false);
+                    measurementModel.startStopButtonClicked();
+                    print(
+                        'DEBUG: _StartStopButtonWithTimerState: startStopButtonClicked llamado'); // DEBUG
 
-              if (!_isRunning && state != SessionState.processing) {
-                print('DEBUG: _StartStopButtonWithTimerState: Iniciando timer desde botón'); // DEBUG
-                _startTimer();
-              } else {
-                print('DEBUG: _StartStopButtonWithTimerState: Deteniendo timer desde botón'); // DEBUG
-                _stopTimer();
-              }
-            }
+                    if (!_isRunning && state != SessionState.processing) {
+                      print(
+                          'DEBUG: _StartStopButtonWithTimerState: Iniciando timer desde botón'); // DEBUG
+                      _startTimer();
+                    } else {
+                      print(
+                          'DEBUG: _StartStopButtonWithTimerState: Deteniendo timer desde botón'); // DEBUG
+                      _stopTimer();
+                    }
+                  }
                 : null,
           ),
         ),
@@ -293,7 +325,8 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
             value: _startTime / _endTime,
             minHeight: 8,
             backgroundColor: Colors.grey[300],
-            valueColor: AlwaysStoppedAnimation<Color>(Colors.green), // Color verde
+            valueColor:
+                AlwaysStoppedAnimation<Color>(Colors.green), // Color verde
           ),
         ),
         const SizedBox(height: 10),
@@ -303,7 +336,7 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
         ),
         const SizedBox(height: 5),
         Text(
-          "Sala: ZNZACZ",
+          "${translations[widget.selectedLanguage]!['room']!}: $room",
           style: const TextStyle(fontSize: 14),
         ),
       ],
@@ -323,8 +356,10 @@ class _PulseRate extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    var pulseRate = context.select<MeasurementModel, String?>((model) => model.pulseRate);
-    print('DEBUG: _PulseRate: build llamado con pulseRate = $pulseRate'); // DEBUG
+    var pulseRate =
+        context.select<MeasurementModel, String?>((model) => model.pulseRate);
+    print(
+        'DEBUG: _PulseRate: build llamado con pulseRate = $pulseRate'); // DEBUG
 
     if (pulseRate == null) {
       return Container();
@@ -366,11 +401,14 @@ class _CameraPreviewState extends State<_CameraPreview> {
 
   @override
   Widget build(BuildContext context) {
-    var sessionState = context.select<MeasurementModel, SessionState?>((model) => model.sessionState);
-    print('DEBUG: _CameraPreviewState: build llamado con sessionState = $sessionState'); // DEBUG
+    var sessionState = context
+        .select<MeasurementModel, SessionState?>((model) => model.sessionState);
+    print(
+        'DEBUG: _CameraPreviewState: build llamado con sessionState = $sessionState'); // DEBUG
 
     if (sessionState == null || sessionState == SessionState.initializing) {
-      print('DEBUG: _CameraPreviewState: SessionState es null o inicializando'); // DEBUG
+      print(
+          'DEBUG: _CameraPreviewState: SessionState es null o inicializando'); // DEBUG
       return Container();
     }
 
@@ -378,7 +416,8 @@ class _CameraPreviewState extends State<_CameraPreview> {
       onChange: (size) {
         setState(() {
           this.size = size;
-          print('DEBUG: _CameraPreviewState: Tamaño del widget cambiado a $size'); // DEBUG
+          print(
+              'DEBUG: _CameraPreviewState: Tamaño del widget cambiado a $size'); // DEBUG
         });
       },
       child: Center(
@@ -389,7 +428,8 @@ class _CameraPreviewState extends State<_CameraPreview> {
             fit: BoxFit.cover,
             child: SizedBox(
               width: size?.width ?? MediaQuery.of(context).size.width,
-              height: (size?.width ?? MediaQuery.of(context).size.width) * (4 / 3),
+              height:
+                  (size?.width ?? MediaQuery.of(context).size.width) * (4 / 3),
               child: Stack(
                 children: [
                   const CameraPreviewView(),
@@ -483,8 +523,9 @@ class _FaceDetectionView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     var imageInfo = context.select<MeasurementModel, sdk_image_data.ImageData?>(
-            (model) => model.imageData);
-    print('DEBUG: _FaceDetectionView: build llamado con imageInfo = $imageInfo'); // DEBUG
+        (model) => model.imageData);
+    print(
+        'DEBUG: _FaceDetectionView: build llamado con imageInfo = $imageInfo'); // DEBUG
 
     if (imageInfo == null || size == null) {
       print('DEBUG: _FaceDetectionView: imageInfo o size es null'); // DEBUG
@@ -497,9 +538,12 @@ class _FaceDetectionView extends StatelessWidget {
       return Container();
     }
 
-    var error = context.select<MeasurementModel, String?>((model) => model.error);
-    var warning = context.select<MeasurementModel, String?>((model) => model.warning);
-    print('DEBUG: _FaceDetectionView: error = $error, warning = $warning'); // DEBUG
+    var error =
+        context.select<MeasurementModel, String?>((model) => model.error);
+    var warning =
+        context.select<MeasurementModel, String?>((model) => model.warning);
+    print(
+        'DEBUG: _FaceDetectionView: error = $error, warning = $warning'); // DEBUG
 
     Color rectangleColor = const Color(0xFF70fb47);
 
@@ -525,7 +569,8 @@ class _FaceDetectionView extends StatelessWidget {
     double width = roi.width * scaleX;
     double height = roi.height * scaleY;
 
-    print('DEBUG: _FaceDetectionView: Dibujando cuadro con color $rectangleColor en posición left=$left, top=$top, width=$width, height=$height'); // DEBUG
+    print(
+        'DEBUG: _FaceDetectionView: Dibujando cuadro con color $rectangleColor en posición left=$left, top=$top, width=$width, height=$height'); // DEBUG
 
     return Positioned(
       left: left,

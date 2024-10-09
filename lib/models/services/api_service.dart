@@ -3,10 +3,11 @@ import 'dart:convert';
 import 'package:flutter_videocall/models/entities/entities.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   final String _baseUrl = 'http://192.168.1.6:8000/api';
-
+ SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   Future<List<TypeDocuments>> getTypePRovider() async {
     final response = await http.get(Uri.parse('$_baseUrl/document-types'));
 
@@ -40,7 +41,7 @@ class ApiService {
     }
   }
 
-    Future getRoom(patientId) async {
+  Future getRoom(patientId) async {
 
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
@@ -61,6 +62,51 @@ class ApiService {
       return {"success": true, "token": jsonResponse['token_twilio'], "room": jsonResponse['room']};
     } else {
       return {"success": false, "message": jsonResponse['message']};
+    }
+  }
+
+  Future getCodeScan(patientId) async {
+    final DateTime now = DateTime.now();
+    final DateFormat formatter = DateFormat.yMd().add_Hms();
+    final String hour = formatter.format(now);
+ 
+    final response = await http.post(Uri.parse('$_baseUrl/face-scans'),
+        body: {
+          "patient_id": patientId,
+          "date": hour,
+        });
+    final jsonResponse = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return {"success": true, "face_scan_id": jsonResponse['face_scan_id'], "face_scan_code": jsonResponse['face_scan_code']};
+    } else {
+      return {"success": false, "message": jsonResponse['message']};
+    }
+  }
+  Future sendResultScan(id,data) async {
+ final  idPatient = await prefs.getString('idPatient');
+    final response = await http.post(Uri.parse('$_baseUrl/face-scans'),
+        body: {
+          "patient_id": idPatient,
+          "scan_id": id,
+          "results": data,
+        });
+    final jsonResponse = json.decode(response.body);
+
+    if (response.statusCode == 200) {
+      return {"success": true};
+    } else {
+      return {"success": false, "message": jsonResponse['message']};
+    }
+  }
+  Future getPaymentCode() async {
+    final response = await http.post(Uri.parse('$_baseUrl/booth-code-payments'));
+    final jsonResponse = json.decode(response.body);
+    if (response.statusCode == 200) {
+       await prefs.setString('paymentcode', jsonResponse['payment_code']);
+      return {"success": true, "code": jsonResponse['payment_code'], "message": jsonResponse['Registro guardado correctamente']};
+    } else {
+      return {"success": false, "message": response.body};
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:binah_flutter_sdk/images/image_validity.dart';
 import 'package:binah_flutter_sdk/license/license_details.dart';
 import 'package:binah_flutter_sdk/vital_signs/vitals/vital_sign_blood_pressure.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_videocall/pages/pages.dart';
 import 'package:wakelock_plus/wakelock_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:binah_flutter_sdk/images/image_data_listener.dart';
@@ -46,14 +47,16 @@ import 'package:binah_flutter_sdk/session/session_enabled_vital_signs.dart';
 import 'package:binah_flutter_sdk/session/session_info_listener.dart';
 import 'package:binah_flutter_sdk/alerts/alert_codes.dart';
 import 'package:binah_flutter_sdk/health_monitor_exception.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 
 class MeasurementModel extends ChangeNotifier
     implements SessionInfoListener, VitalSignsListener, ImageDataListener {
-  String licenseKey = '4CF183-FF2816-44998A-9A3CD3-08BCAB-BF8C5D'; // Inicializado vacío
+  String licenseKey = ''; // Inicializado vacío
   final int measurementDuration = 70;
   Session? _session;
   sdk_image_data.ImageData? imageData;
-
+  SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   String? error;
   String? warning;
   SessionState? sessionState;
@@ -62,23 +65,20 @@ class MeasurementModel extends ChangeNotifier
   Map<int, String> errorCauses = {};
   String _selectedLanguage = 'EN';
 
-  //
-  //MeasurementModel() {
-    //_loadLanguagePreference();
-    //_loadErrorCauses();
-    //_loadLicenseKey(); // Cargamos el licenseKey desde SharedPreferences
-  //}
+  MeasurementModel() {
+    _loadLanguagePreference();
+    _loadErrorCauses();
+    _loadLicenseKey(); // Cargamos el licenseKey desde SharedPreferences
+  }
 
-  // Future<void> _loadLanguagePreference() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   _selectedLanguage = prefs.getString('language') ?? 'EN';
-  // }
+  Future<void> _loadLanguagePreference() async {
+    _selectedLanguage = await prefs.getString('language') ?? 'EN';
+  }
 
-  // Future<void> _loadLicenseKey() async {
-  //   SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   licenseKey = prefs.getString('secretKey') ?? '';
-  //   notifyListeners();
-  // }
+  Future<void> _loadLicenseKey() async {
+    licenseKey = await prefs.getString('secretKey') ?? '';
+    notifyListeners();
+  }
 
   Future<void> _loadErrorCauses() async {
     final String response =
@@ -131,13 +131,13 @@ class MeasurementModel extends ChangeNotifier
   void onVitalSign(VitalSign vitalSign) {
     if (vitalSign.type == VitalSignTypes.pulseRate) {
       pulseRate =
-      "pulse_rate ${(vitalSign as VitalSignPulseRate).value}";
+      "${translations[_selectedLanguage]!['pulse_rate']} ${(vitalSign as VitalSignPulseRate).value}";
     } else if (vitalSign.type == VitalSignTypes.oxygenSaturation) {
       print(
-          "oxygen_saturation ${(vitalSign as VitalSignOxygenSaturation).value}");
+          "${translations[_selectedLanguage]!['oxygen_saturation']} ${(vitalSign as VitalSignOxygenSaturation).value}");
     } else if (vitalSign.type == VitalSignTypes.respirationRate) {
       print(
-          "respiration_rate ${(vitalSign as VitalSignRespirationRate).value}");
+          "${translations[_selectedLanguage]!['respiration_rate']} ${(vitalSign as VitalSignRespirationRate).value}");
     }
     notifyListeners();
   }
@@ -228,27 +228,27 @@ class MeasurementModel extends ChangeNotifier
     var wellnessLevelValue = wellnessLevel?.value ?? "N/A";
 
     finalResultsString =
-    "pulse_rate $pulseRateValue\n"
+    "${translations[_selectedLanguage]!['pulse_rate']} $pulseRateValue\n"
         "Respiration Rate: $respirationRateValue\n"
-        "blood_pressure $bloodPressureValue\n"
-        "hemoglobin $hemoglobinValue\n"
-        "hemoglobin_a1c $hemoglobinA1CValue\n"
+        "${translations[_selectedLanguage]!['blood_pressure']} $bloodPressureValue\n"
+        "${translations[_selectedLanguage]!['hemoglobin']} $hemoglobinValue\n"
+        "${translations[_selectedLanguage]!['hemoglobin_a1c']} $hemoglobinA1CValue\n"
         "LF/HF: $lfhfValue\n"
         "Mean RRi: $meanRriValue\n"
         "PNS Index: $pnsIndexValue\n"
-        "pns_zone $pnsZoneValue\n"
+        "${translations[_selectedLanguage]!['pns_zone']} $pnsZoneValue\n"
         "PRQ: $prqValue\n"
         "RMSSD: $rmssdValue\n"
-        "rri_values $rriValues\n"
+        "${translations[_selectedLanguage]!['rri_values']} $rriValues\n"
         "SD1: $sd1Value\n"
         "SD2: $sd2Value\n"
         "SDNN: $sdnnValue\n"
-        "sns_index $snsIndexValue\n"
-        "sns_zone $snsZoneValue\n"
-        "stress_level $stressLevelValue\n"
-        "stress_index $stressIndexValue\n"
-        "wellness_index $wellnessIndexValue\n"
-        "wellness_level $wellnessLevelValue";
+        "${translations[_selectedLanguage]!['sns_index']} $snsIndexValue\n"
+        "${translations[_selectedLanguage]!['sns_zone']} $snsZoneValue\n"
+        "${translations[_selectedLanguage]!['stress_level']} $stressLevelValue\n"
+        "${translations[_selectedLanguage]!['stress_index']} $stressIndexValue\n"
+        "${translations[_selectedLanguage]!['wellness_index']} $wellnessIndexValue\n"
+        "${translations[_selectedLanguage]!['wellness_level']} $wellnessLevelValue";
 
     notifyListeners();
   }
@@ -320,7 +320,8 @@ class MeasurementModel extends ChangeNotifier
           .withVitalSignsListener(this)
           .withSessionInfoListener(this)
           .build(LicenseDetails(licenseKey));
-           print( "debug session");
+          print('DEBUG:  $_session'); // DEBUG
+
     } on HealthMonitorException catch (e) {
       final cause = getErrorCause(e.code);
       error = "Error: ${e.code} Cause: $cause";

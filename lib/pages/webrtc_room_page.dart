@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_videocall/providers/patient_provider.dart';
+import 'package:flutter_videocall/models/providers/patient_provider.dart';
 import 'package:flutter_videocall/states/state_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as providers;

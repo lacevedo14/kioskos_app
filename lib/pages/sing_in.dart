@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_videocall/models/entities/entities.dart';
 import 'package:flutter_videocall/models/services/login_service.dart';
-import 'package:flutter_videocall/pages/pages.dart';
-import 'package:flutter_videocall/providers/login_form_provider.dart';
-import 'package:flutter_videocall/providers/patient_provider.dart';
+import 'package:flutter_videocall/models/providers/login_form_provider.dart';
+import 'package:flutter_videocall/models/providers/patient_provider.dart';
+import 'package:flutter_videocall/models/services/services.dart';
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 //final Future<TypeDocuments> list = typedocumentdata.getTypePRovider();
 
@@ -21,33 +22,44 @@ class SignIn extends StatelessWidget {
     const appTitle = 'Inicio de Sesion';
 
     return Scaffold(
+        extendBodyBehindAppBar: true,
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          leading: IconButton(
+              onPressed: () => context.go('/'),
+              icon: const Icon(
+                Icons.arrow_back,
+                color: Colors.white,
+              )),
+        ),
         body: AuthBackground(
             child: SingleChildScrollView(
-      child: Column(
-        children: [
-          const SizedBox(height: 250),
-          CardContainer(
-              child: Column(
+          child: Column(
             children: [
-              const SizedBox(height: 10),
-              Text('Login', style: Theme.of(context).textTheme.headlineMedium),
-              const SizedBox(height: 30),
-              ChangeNotifierProvider(
-                  create: (_) => LoginFormProvider(), child: MyLoginForm())
+              const SizedBox(height: 150),
+              CardContainer(
+                  child: Column(
+                children: [
+                  const SizedBox(height: 10),
+                  Text('Login',
+                      style: Theme.of(context).textTheme.headlineMedium),
+                  const SizedBox(height: 30),
+                  ChangeNotifierProvider(
+                      create: (_) => LoginFormProvider(), child: MyLoginForm())
+                ],
+              )),
+              const SizedBox(height: 50),
+              TextButton(
+                style: ButtonStyle(
+                  foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+                ),
+                onPressed: () => context.go('/sign-up'),
+                child: const Text('Crear una nueva cuenta'),
+              ),
+              const SizedBox(height: 50),
             ],
-          )),
-          const SizedBox(height: 50),
-          TextButton(
-            style: ButtonStyle(
-              foregroundColor: WidgetStateProperty.all<Color>(Colors.blue),
-            ),
-            onPressed: () => context.go('/sign-up'),
-            child: const Text('Crear una nueva cuenta'),
           ),
-          const SizedBox(height: 50),
-        ],
-      ),
-    )));
+        )));
   }
 }
 
@@ -62,12 +74,13 @@ class MyLoginForm extends StatefulWidget {
 
 class MyLoginFormState extends State<MyLoginForm> {
   String dropdownValue = '';
-
+  final ApiService _apiService = ApiService();
   late Future<List<TypeDocuments>> list;
+   SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   @override
   void initState() {
     super.initState();
-    list = apiService.getTypePRovider();
+    list = _apiService.getTypePRovider();
   }
 
   @override
@@ -154,18 +167,19 @@ class MyLoginFormState extends State<MyLoginForm> {
                               FocusScope.of(context).unfocus();
 
                               if (!loginForm.isValidForm()) return;
-                                loginForm.isLoading = true;
-                                //final Future<String> response = loginForm.loginUser();
-                                Map response =
-                                    await loginService.loginUser(loginForm);
-                                    loginForm.isLoading = false;
-                                if (response['success']) {
-                                  patient.patient = response['patient'];
-                                  context.go('/entry-page');
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(response['message'])),
-                                  );
+                              loginForm.isLoading = true;
+                              //final Future<String> response = loginForm.loginUser();
+                              Map response =
+                                  await loginService.loginUser(loginForm);
+                              loginForm.isLoading = false;
+                              if (response['success']) {
+                                patient.patient = response['patient'];
+                                await prefs.setString('idPatient', response['patient']['id']);
+                                context.go('/entry-page');
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response['message'])),
+                                );
                               }
                               //print(response);
                               loginForm.isLoading = false;

@@ -4,3 +4,8 @@ export 'package:flutter_videocall/pages/webrtc_room_page.dart';
 export 'package:flutter_videocall/pages/entry_page.dart';
 export 'package:flutter_videocall/pages/home.dart';
 export 'package:flutter_videocall/pages/measurement_screen.dart';
+export 'package:flutter_videocall/pages/consent_use.dart';
+export 'package:flutter_videocall/pages/step1.dart';
+export 'package:flutter_videocall/pages/step2.dart';
+export 'package:flutter_videocall/pages/step3.dart';
+export 'package:flutter_videocall/pages/translations.dart';

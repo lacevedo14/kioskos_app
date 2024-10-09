@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/models/entities/videocall.dart';
 import 'package:flutter_videocall/models/entities/webrtc.dart';
-import 'package:flutter_videocall/pages/pages.dart';
+import 'package:flutter_videocall/models/services/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_programmable_video/twilio_programmable_video.dart';
 import 'package:uuid/uuid.dart';
 
@@ -36,9 +37,10 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   bool bluetoothPreferred = false;
   late CameraCapturer _cameraCapturer;
   late Room _room;
-
+  final ApiService _apiService = ApiService();
   final _remoteParticipantSubscriptions = <StreamSubscription>[];
-
+  SharedPreferencesAsync  prefs = SharedPreferencesAsync();
+  
   Future<void> initializeWebRtc() async {
     await TwilioProgrammableVideo.debug(dart: true, native: true);
     await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
@@ -52,7 +54,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
     //     bluetoothPreferred: bluetoothPreferred);
 
     var trackId = const Uuid().v4();
-    final dataAppoiment = await apiService.getRoom(state.getIdPatient);
+    final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
+    await prefs.setString('room', dataAppoiment['room']);
     if (dataAppoiment['success']) {
       var connectOptions = ConnectOptions(
         dataAppoiment['token'],

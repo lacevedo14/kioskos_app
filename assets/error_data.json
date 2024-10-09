@@ -1,0 +1,401 @@
+[
+    {
+        "code": 4,
+        "name": "deviceCodeLowPowerModeEnabledError",
+        "domain": "DEVICE",
+        "cause": "A session was requested to run while the device is in 'Low Power' mode.",
+        "solution": "The user should open the device settings and turn off 'Low Power Mode' or charge your device until the 'Low Power Mode' turns off."
+    },
+    {
+        "code": 6,
+        "name": "deviceCodeTorchUnavailableError",
+        "domain": "DEVICE",
+        "cause": "A PPG session was requested to run, but the SDK could not activate the flashlight. It could be either because the device has no flashlight or due to a software or hardware issue.",
+        "solution": "The user should verify that the device flashlight works properly and retry."
+    },
+    {
+        "code": 7,
+        "name": "deviceCodeTorchShutDownError",
+        "domain": "DEVICE",
+        "cause": "The flashlight was shut down while a PPG session was running.",
+        "solution": "The user should verify that device flashlight works properly and retry."
+    },
+    {
+        "code": 8,
+        "name": "deviceCodeMinimumOsVersionError",
+        "domain": "DEVICE",
+        "cause": "The device's operating system version is lower than the minimum version required to run the SDK.",
+        "solution": "Upgrade the device operating system or use another device."
+    },
+    {
+        "code": 14,
+        "name": "deviceCodeMinimumBatteryLevelError",
+        "domain": "DEVICE",
+        "cause": "The battery level is below 20% and prevents accurate measurement.",
+        "solution": "The user should connect the device to a charger and wait until battery is sufficiently charged."
+    },
+    {
+        "code": 17,
+        "name": "deviceCodeClockSkewError",
+        "domain": "DEVICE",
+        "cause": "Severe clock skew detected",
+        "solution": "The user should verify that the device date, time, and timezone are set correctly. It is recommended to set the date and time automatically in the device settings."
+    },
+    {
+        "code": 19,
+        "name": "deviceBluetoothIsOffError",
+        "domain": "DEVICE",
+        "cause": "The Bluetooth is off.",
+        "solution": "Instruct the user to turn on Bluetooth."
+    },
+    {
+        "code": 20,
+        "name": "deviceBluetoothMissingPermissionsError",
+        "domain": "DEVICE",
+        "cause": "The application does not have Bluetooth permissions.\t",
+        "solution": "Instruct the user to grant the application permissions to use the Bluetooth.\t"
+    },
+    {
+        "code": 21,
+        "name": "deviceLocationIsOffError",
+        "domain": "DEVICE",
+        "cause": "The Location is off.",
+        "solution": "Instruct the user to turn on Location."
+    },
+    {
+        "code": 1001,
+        "name": "cameraCodeNoCameraError",
+        "domain": "CAMERA",
+        "cause": "The `session.start()` command was called, but the device has no camera with the required specifications.",
+        "solution": "The camera must support a resolution of 640x480 at 30FPS. The rear camera requires a flashlight for finger measurements. The user should verify that the device camera works properly."
+    },
+    {
+        "code": 1002,
+        "name": "cameraCodeCameraOpenError",
+        "domain": "CAMERA",
+        "cause": "Could not operate the camera.",
+        "solution": "The user should verify that the device camera works properly and try again. If the problem persists, the user should restart the application."
+    },
+    {
+        "code": 1005,
+        "name": "cameraCodeCameraMissingPermissionsError",
+        "domain": "CAMERA",
+        "cause": "The application does not have permission to access the camera.",
+        "solution": "The user should access the device settings and grant the application permission to use the camera."
+    },
+    {
+        "code": 1501,
+        "name": "cameraCodeUnexpectedImageDimensionsWarning",
+        "domain": "CAMERA",
+        "cause": "The images received from the camera have a different resolution than the requested resolution.",
+        "solution": "Instruct the user to retry taking the measurements. If the problem persists, then the device is probably malfunctioning, or does not support VGA resolution.  The user should be instructed to use a different device. Although this is just a \"warning\" alert, and the measurement continues, the accuracy of the measurement may be impacted by the unexpected resolution."
+    },
+    {
+        "code": 2002,
+        "name": "licenseCodeActivationLimitReachedError",
+        "domain": "LICENSE",
+        "cause": "No more devices can be used with your license",
+        "solution": "Contact the sales team to increase the number of device authorizations in your license."
+    },
+    {
+        "code": 2003,
+        "name": "licenseCodeMeterAttributeUsesLimitReachedError",
+        "domain": "LICENSE",
+        "cause": "No more measurements are allowed for the provided license. (Relevant only for customers with a 'per session' license).",
+        "solution": "Contact the sales team to increase the number of measurements in your license."
+    },
+    {
+        "code": 2004,
+        "name": "licenseCodeAuthenticationFailedError",
+        "domain": "LICENSE",
+        "cause": "Several issues might cause this error: clock skew detected, the SDK was unable to authenticate the license, a bad token was received from the license server",
+        "solution": "The user should take the following actions: Check the internet connection. Set the device time correctly. Verify that the device has sufficient storage."
+    },
+    {
+        "code": 2007,
+        "name": "licenseCodeInvalidLicenseKeyError",
+        "domain": "LICENSE",
+        "cause": "The provided license key is invalid.",
+        "solution": "Use the license key provided by the support team. If the problem persists, contact the support team."
+    },
+    {
+        "code": 2010,
+        "name": "licenseCodeRevokedLicenseError",
+        "domain": "LICENSE",
+        "cause": "The license was revoked.",
+        "solution": "Contact the customer support team."
+    },
+    {
+        "code": 2016,
+        "name": "licenseCodeInternalError9",
+        "domain": "LICENSE",
+        "cause": "SSL error. Unable to authenticate the license server response.",
+        "solution": "The user should check the device's local time, internet connection, try a different network, or try again later."
+    },
+    {
+        "code": 2017,
+        "name": "licenseCodeLicenseExpiredError",
+        "domain": "LICENSE",
+        "cause": "The license has expired.",
+        "solution": "Contact the customer support team."
+    },
+    {
+        "code": 2018,
+        "name": "licenseCodeLicenseSuspendedError",
+        "domain": "LICENSE",
+        "cause": "The license is suspended.",
+        "solution": "Contact the customer support team."
+    },
+    {
+        "code": 2024,
+        "name": "licenseCodeNetworkIssuesError",
+        "domain": "DEVICE",
+        "cause": "No internet connection.",
+        "solution": "Check your internet connection and The user should check the internet connection and try again. again"
+    },
+    {
+        "code": 2025,
+        "name": "licenseCodeSslHandshakeError",
+        "domain": "DEVICE",
+        "cause": "SSL certificate security warning.",
+        "solution": "The user should check the device's local time, internet connection, try a different network, or try again later."
+    },
+    {
+        "code": 2032,
+        "name": "licenseCodeInputLicenseKeyEmptyError",
+        "domain": "LICENSE",
+        "cause": "No license key was provided to the SDK.",
+        "solution": "Initiate the SDK with a valid license key, provided by the support team."
+    },
+    {
+        "code": 2034,
+        "name": "licenseCodeInputProductIdIllegalError",
+        "domain": "LICENSE",
+        "cause": "An invalid product ID was provided.",
+        "solution": "The product ID must be `null` when establishing a session."
+    },
+    {
+        "code": 2035,
+        "name": "licenseCodeCannotOpenFileForReadError",
+        "domain": "LICENSE",
+        "cause": "The SDK cannot read from the file system, or a file may be corrupted.",
+        "solution": "Instruct the user to check the installation integrity."
+    },
+    {
+        "code": 2036,
+        "name": "licenseCodeMonthlyUsageTrackingRequiresSyncError",
+        "domain": "LICENSE",
+        "cause": "The SDK failed to authenticate with the license server as required by the license type.",
+        "solution": "Instruct the user to check the internet connection and try again."
+    },
+    {
+        "code": 2037,
+        "name": "licenseCodeSslHandshakeDeviceDateError",
+        "domain": "LICENSE",
+        "cause": "SSL certificate security warning.",
+        "solution": "The user should check the device's local time, internet connection, try a different network, or try again later."
+    },
+    {
+        "code": 2038,
+        "name": "licenseCodeSslHandshakeCertificateExpiredError",
+        "domain": "LICENSE",
+        "cause": "SSL certificate security warning.",
+        "solution": "The user should check the device's local time, internet connection, try a different network, or try again later."
+    },
+    {
+        "code": 2039,
+        "name": "licenseCodeMinSdkError",
+        "domain": "LICENSE",
+        "cause": "The SDK version is too old to be used with this license.",
+        "solution": "Upgrade to the latest SDK version or contact the support team."
+    },
+    {
+        "code": 2042,
+        "name": "licenseCodeNetworkTimeoutError",
+        "domain": "LICENSE",
+        "cause": "Network timeout reached for a single call",
+        "solution": "Advise the user to try the following steps: verify the internet connection speed, restart the application, wait briefly, attempt using another network, or try again later. If the issue persists, please contact our support team."
+    },
+    {
+        "code": 3003,
+        "name": "measurementCodeMisdetectionDurationExceedsLimitError",
+        "domain": "MEASUREMENT",
+        "cause": "The face or finger were not detected for a period of over 0.5 seconds several times.",
+        "solution": "The user should ensure that the face or finger remains still during the measurement and follow the best practices provided by the provider for taking accurate measurements."
+    },
+    {
+        "code": 3004,
+        "name": "measurementCodeInvalidRecentDetectionRateError",
+        "domain": "MEASUREMENT",
+        "cause": "More than 2 periods of multiple frame losses were detected during the measurement.",
+        "solution": "The user should make sure that the device is not overheating or low on resources. The user should not use debugging tools or developer tools or perform intensive logging during the measurement. If the problem persists, the user should close other applications or services, or restart the device. The user should make sure to follow the best practices for taking a measurement."
+    },
+    {
+        "code": 3006,
+        "name": "measurementCodeLicenseActivationFailedError",
+        "domain": "MEASUREMENT",
+        "cause": "The license activation failed.",
+        "solution": "The user should check the device's internet connection, and should check that no invalid proxy configuration is used. If the problem persists, the user should contact the support team."
+    },
+    {
+        "code": 3008,
+        "name": "measurementCodeInvalidMeasurementAverageDetectionRateError",
+        "domain": "MEASUREMENT",
+        "cause": "The average frame rate is significantly lower than expected.",
+        "solution": "Instruct the user to close resource-intensive applications. Ensure the device isn't busy, overloaded, overheated, or affected by OS, software, or hardware issues. Allow the device to cool down and retry. If the problem persists, consider using another device."
+    },
+    {
+        "code": 3009,
+        "name": "measurementCodeTooManyFramesInorderError",
+        "domain": "MEASUREMENT",
+        "cause": "Multiple consecutive frames were received in incorrect timestamp order. This error occurs if warning 3506 is issued multiple times.",
+        "solution": "The user should rerun the measurement."
+    },
+    {
+        "code": 3010,
+        "name": "measurementCodeExternalPpgDeviceMisplacedError",
+        "domain": "MEASUREMENT",
+        "cause": "The sensor is misplaced, removed, or not fastened to the skin.",
+        "solution": "Instruct the user to wear the PPG device snugly over a clean area of skin on their non-dominant upper arm. Ensure direct contact with the skin (underneath clothing) and avoid placing it over tattoos. If issues persist, clean the device and the skin area, and fasten the band securely."
+    },
+    {
+        "code": 3500,
+        "name": "measurementCodeMisdetectionDurationExceedsLimitWarning",
+        "domain": "MEASUREMENT",
+        "cause": "The face/finger was not detected for a period of over 0.5 seconds.",
+        "solution": "The instantaneous vital signs should not be displayed to the user for a few seconds until the algorithms overcome the face/finger detection issues.  The user should make sure to follow the best practices for taking a measurement."
+    },
+    {
+        "code": 3505,
+        "name": "measurementCodeInvalidRecentFpsRateWarning",
+        "domain": "MEASUREMENT",
+        "cause": "Camera FPS is degraded and may affect the measurement quality.",
+        "solution": "The user should make sure to follow the best practices for taking a measurement."
+    },
+    {
+        "code": 3506,
+        "name": "measurementCodeMeasurementMisplacedFrameWarning",
+        "domain": "MEASUREMENT",
+        "cause": "A frame was received in incorrect timestamp order.",
+        "solution": "The user should proceed with the measurement."
+    },
+    {
+        "code": 4505,
+        "name": "vitalSignCodeBloodPressureProcessingFailedWarning",
+        "domain": "VITAL_SIGNS",
+        "cause": "Failure to calculate blood pressure in this measurement. This warning does not impact other vital sign measurements. The failure may have been caused by corrupted installation files.",
+        "solution": "Blood pressure will not be calculated for this measurement session. The other vital sign results will be presented. The user can retry the measurement.  If the problem persists, the user should reinstall/repair the app."
+    },
+    {
+        "code": 4506,
+        "name": "vitalSignCodeMeasuringWithNoEnabledVitalSignsWarning",
+        "domain": "VITAL_SIGNS",
+        "cause": "No vital signs were processed as part of this measurement.",
+        "solution": "This warning is issued when the license does not support the calculation of any vital signs, or when the SDK cannot access license information. The user should check the internet connection and try another measurement."
+    },
+    {
+        "code": 6004,
+        "name": "sessionCodeIllegalStartCallError",
+        "domain": "SESSION",
+        "cause": "A session `start` call was made when the session is not in READY state",
+        "solution": "Wait for session state to become READY before calling `start`."
+    },
+    {
+        "code": 6005,
+        "name": "sessionCodeIllegalStopCallError",
+        "domain": "SESSION",
+        "cause": "A session `stop` call was made when the session is not in PROCESSING state",
+        "solution": "Call `stop` only when session is processing."
+    },
+    {
+        "code": 7002,
+        "name": "initializationCodeInvalidProcessingTimeError",
+        "domain": "INITIALIZATION",
+        "cause": "An invalid session time was provided when creating a session.",
+        "solution": "Use a valid session time. The valid session time range is between 20-180 seconds."
+    },
+    {
+        "code": 7004,
+        "name": "initializationCodeRotationAndOrientationMismatch",
+        "domain": "INITIALIZATION",
+        "cause": "Both the `withImageRotation` and `withDeviceOrientation` properties were used when creating a session.",
+        "solution": "The use of both the `withImageRotation` and `withDeviceOrientation` properties are not supported when creating a session. Use only the `withDeviceOrientation` property."
+    },
+    {
+        "code": 7005,
+        "name": "initializationCodeInvalidLicenseFormat",
+        "domain": "INITIALIZATION",
+        "cause": "The provided license key is either empty or its format is invalid.",
+        "solution": "Check the SDK license key provided by the support team. Ensure it is not empty and follows a valid format - avoid including spaces, newlines, or special characters."
+    },
+    {
+        "code": 7006,
+        "name": "initializationCodeSdkLoadFailure",
+        "domain": "INITIALIZATION",
+        "cause": "The SDK failed to initialize, probably due to unsupported hardware.",
+        "solution": "The user should verify that the device chipset is 64 bits, and that the Android OS is 64 bits. If the problem persists,  contact the support team and specify the exact device model used."
+    },
+    {
+        "code": 7007,
+        "name": "initializationCodeUnsupportedUserWeight",
+        "domain": "INITIALIZATION",
+        "cause": "The weight submitted by the user is not supported. The supported weight range is between 40 to 200 kilograms.",
+        "solution": "The user should either submit a weight within the supported range, or not specify a weight at all."
+    },
+    {
+        "code": 7008,
+        "name": "initializationCodeUnsupportedUserAge",
+        "domain": "INITIALIZATION",
+        "cause": "The age submitted by the user is not supported. The supported age range is between 18 to 110 years.",
+        "solution": "The user should either submit an age within the supported range or not specify an age at all."
+    },
+    {
+        "code": 7009,
+        "name": "initializationCodeConcurrentSessionsError",
+        "domain": "INITIALIZATION",
+        "cause": "Trying to create a new session before terminating the previous session.",
+        "solution": "The previous session should be terminated before establishing a new one."
+    },
+    {
+        "code": 7010,
+        "name": "initializationMissingPolarDependenciesError",
+        "domain": "INITIALIZATION",
+        "cause": "Missing the Polar dependencies. ",
+        "solution": "Please refer to the documentation for additional information."
+    },
+    {
+        "code": 8003,
+        "name": "ppgDeviceConnectionTimeoutError",
+        "domain": "DEVICE",
+        "cause": "It took too long to the Bluetooth device to respond to the connection request. ",
+        "solution": "Instruct the user to turn off the bluetooth device and after a while turn it back on and try again to connect."
+    },
+    {
+        "code": 8004,
+        "name": "ppgDeviceInvalidDeviceIdError",
+        "domain": "DEVICE",
+        "cause": "The requested ID of the Bluetooth device has an invalid format.",
+        "solution": "Make sure to provide a valid Bluetooth device ID."
+    },
+    {
+        "code": 8005,
+        "name": "ppgDeviceUnsupportedFirmwareVersionError",
+        "domain": "DEVICE",
+        "cause": "The Bluetooth device firmware version is not supported.",
+        "solution": "Upgrade the Bluetooth device firmware or try another device."
+    },
+    {
+        "code": 8006,
+        "name": "ppgDeviceUnsupportedDeviceModelError",
+        "domain": "DEVICE",
+        "cause": "The Bluetooth device hardware is not supported.",
+        "solution": "Instruct the user to use another Bluetooth device."
+    },
+    {
+        "code": 8007,
+        "name": "ppgDeviceConnectionError",
+        "domain": "DEVICE",
+        "cause": "The Bluetooth device was disconnected.",
+        "solution": "Instruct the user to check the Bluetooth device battery, turn the Bluetooth off and back on and to try connecting again."
+    }
+]

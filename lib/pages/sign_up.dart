@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_videocall/models/entities/entities.dart';
 import 'package:flutter_videocall/models/services/services.dart';
-import 'package:flutter_videocall/providers/patient_provider.dart';
-import 'package:flutter_videocall/providers/register_patient_providers.dart';
+import 'package:flutter_videocall/models/providers/patient_provider.dart';
+import 'package:flutter_videocall/models/providers/register_patient_providers.dart';
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 
-final apiService = ApiService();
+
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});
@@ -65,12 +65,13 @@ class MyCustomFormState extends State<MyCustomForm> {
   late Future<List<TypeDocuments>> list;
   late Future<List<Opcion>> gender;
   late Future<List<CodePhone>> codes;
+  final ApiService _apiService = ApiService();
   @override
   void initState() {
     super.initState();
-    list = apiService.getTypePRovider();
-    gender = apiService.getGender();
-    codes = apiService.getCodePhone();
+    list = _apiService.getTypePRovider();
+    gender = _apiService.getGender();
+    codes = _apiService.getCodePhone();
   }
 
   _selectDate(BuildContext context) async {
