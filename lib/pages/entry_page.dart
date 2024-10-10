@@ -57,7 +57,7 @@ class EntryPage extends StatelessWidget {
                               'Scan Facial',
                               style: TextStyle(color: Colors.white),
                             )),
-                        onPressed: () => context.go('/facial-scan'),
+                        onPressed: () => context.go('/use'),
                       ),
                     ],
                   )),

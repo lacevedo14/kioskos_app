@@ -12,3 +12,4 @@ export 'package:flutter_videocall/pages/translations.dart';
 export 'package:flutter_videocall/pages/generate_payment_code.dart';
 export 'package:flutter_videocall/pages/view_code_payment.dart';
 export 'package:flutter_videocall/pages/survey.dart';
+export 'package:flutter_videocall/pages/results_screen.dart';

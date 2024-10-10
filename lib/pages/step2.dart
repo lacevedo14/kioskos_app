@@ -35,12 +35,12 @@ class _Step2ScreenState extends State<Step2Screen> {
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: PreferredSize(
-        preferredSize: Size.fromHeight(65.0),
+        preferredSize: const Size.fromHeight(65.0),
         child: AppBar(
             automaticallyImplyLeading: false,
             backgroundColor: Colors.indigo,
             elevation: 0,
-            title: Text('')),
+            title: const Text('')),
       ),
       body: Center(
         // Centramos el contenido en la pantalla
@@ -58,7 +58,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       value: _isChecked[0],
                       controlAffinity: ListTileControlAffinity.trailing,
                       checkColor: Colors.white,
-                      activeColor: Color(0xFF3A598F),
+                      activeColor: const Color(0xFF3A598F),
                       onChanged: (value) => _toggleCheckbox(0, value),
                     ),
                     CheckboxListTile(
@@ -67,7 +67,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       value: _isChecked[1],
                       controlAffinity: ListTileControlAffinity.trailing,
                       checkColor: Colors.white,
-                      activeColor: Color(0xFF3A598F),
+                      activeColor: const Color(0xFF3A598F),
                       onChanged: (value) => _toggleCheckbox(1, value),
                     ),
                     CheckboxListTile(
@@ -76,7 +76,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       value: _isChecked[2],
                       controlAffinity: ListTileControlAffinity.trailing,
                       checkColor: Colors.white,
-                      activeColor: Color(0xFF3A598F),
+                      activeColor: const Color(0xFF3A598F),
                       onChanged: (value) => _toggleCheckbox(2, value),
                     ),
                     CheckboxListTile(
@@ -85,7 +85,7 @@ class _Step2ScreenState extends State<Step2Screen> {
                       value: _isChecked[3],
                       controlAffinity: ListTileControlAffinity.trailing,
                       checkColor: Colors.white,
-                      activeColor: Color(0xFF3A598F),
+                      activeColor: const Color(0xFF3A598F),
                       onChanged: (value) => _toggleCheckbox(3, value),
                     ),
                   ],
@@ -101,15 +101,15 @@ class _Step2ScreenState extends State<Step2Screen> {
                         context.go('/step1');
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFFFF3A2C),
+                        backgroundColor: const Color(0xFFFF3A2C),
                         padding:
-                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       child: Text(
                         translations[_selectedLanguage]!['cancel']!,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),
@@ -122,13 +122,13 @@ class _Step2ScreenState extends State<Step2Screen> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo,
                         padding:
-                            EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                            const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
                       child: Text(
                         translations[_selectedLanguage]!['next']!,
-                        style: TextStyle(
+                        style: const TextStyle(
                             color: Colors.white, fontWeight: FontWeight.bold),
                       ),
                     ),

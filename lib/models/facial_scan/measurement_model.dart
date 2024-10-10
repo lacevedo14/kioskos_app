@@ -56,7 +56,6 @@ class MeasurementModel extends ChangeNotifier
   final int measurementDuration = 70;
   Session? _session;
   sdk_image_data.ImageData? imageData;
-  SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   String? error;
   String? warning;
   SessionState? sessionState;
@@ -72,11 +71,13 @@ class MeasurementModel extends ChangeNotifier
   }
 
   Future<void> _loadLanguagePreference() async {
-    _selectedLanguage = await prefs.getString('language') ?? 'EN';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _selectedLanguage =  prefs.getString('language') ?? 'EN';
   }
 
   Future<void> _loadLicenseKey() async {
-    licenseKey = await prefs.getString('secretKey') ?? '';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    licenseKey = prefs.getString('secretKey') ?? '';
     notifyListeners();
   }
 

@@ -26,7 +26,6 @@ class MeasurementScreen extends StatefulWidget {
 
 class _MeasurementScreenState extends State<MeasurementScreen> {
   String _selectedLanguage = 'ESP';
-  SharedPreferencesAsync prefs = SharedPreferencesAsync();
     final ApiService _apiService = ApiService(); 
   @override
   void initState() {
@@ -42,7 +41,8 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
   }
 
   Future<void> _loadLanguagePreference() async {
-    _selectedLanguage = await prefs.getString('selectedLanguage') ?? 'ESP';
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _selectedLanguage =  prefs.getString('selectedLanguage') ?? 'ESP';
   }
 
   @override
@@ -90,12 +90,12 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         context.read<MeasurementModel>().screenInFocus(true);
       },
       child: Scaffold(
-        backgroundColor: Color.fromARGB(255, 195, 198, 202),
+        backgroundColor: const Color.fromARGB(255, 195, 198, 202),
         appBar: PreferredSize(
-          preferredSize: Size.fromHeight(60.0),
+          preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: Color(0xFF3A598F),
+            backgroundColor: const Color(0xFF3A598F),
             elevation: 0,
             title: Center(
               child: FittedBox(
@@ -128,8 +128,8 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
             Expanded(
               child: Stack(
                 children: [
-                  Positioned.fill(
-                    child: const _CameraPreview(),
+                  const Positioned.fill(
+                    child: _CameraPreview(),
                   ),
                   Positioned(
                     bottom: 0,
@@ -138,7 +138,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 5),
                       color:
-                          Color.fromARGB(255, 195, 198, 202).withOpacity(0.5),
+                          const Color.fromARGB(255, 195, 198, 202).withOpacity(0.5),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -174,6 +174,17 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         {'mainText': mainText, 'subtitleText': subtitleText}
       ];
       print('DEBUG: MeasurementScreen: Parsed Error - $parsedResults'); // DEBUG
+          SchedulerBinding.instance.addPostFrameCallback((_) {
+      print('DEBUG: MeasurementScreen: Navegando a ResultsScreen');
+      //context.go('/entry-page');
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              ResultsScreen(results: parsedResults, title: title),
+        ),
+      );
+    });
     } else {
       parsedResults = results.split('\n').map((line) {
         var parts = line.split(': ');
@@ -184,21 +195,17 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
       }).toList();
       print(
           'DEBUG: MeasurementScreen: Parsed Results - $parsedResults');
-           var idScan = await prefs.getInt('idScan') ?? '';
-          final data = await _apiService.sendResultScan(idScan,parsedResults); // DEBUG
-    }
- 
-    SchedulerBinding.instance.addPostFrameCallback((_) {
+          SharedPreferences prefs = await SharedPreferences.getInstance();
+           var idScan =  prefs.getInt('idScan') ?? '';
+          final data = await _apiService.sendResultScan(idScan,parsedResults); 
+          
+             SchedulerBinding.instance.addPostFrameCallback((_) {
       print('DEBUG: MeasurementScreen: Navegando a ResultsScreen');
-      context.go('/entry-page');
-      // Navigator.push(
-      //   context,
-      //   MaterialPageRoute(
-      //     builder: (context) =>
-      //         ResultsScreen(results: parsedResults, title: title),
-      //   ),
-      // );
-    });
+    context.go('/entry-page');
+    });// DEBUG
+    }
+  
+  
   }
 }
 
@@ -224,7 +231,7 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
   void initState() {
     super.initState();
     print('DEBUG: _StartStopButtonWithTimerState: initState llamado'); // DEBUG
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(const Duration(seconds: 3), () {
       setState(() {
         _isButtonEnabled = true;
         print(
@@ -326,7 +333,7 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
             minHeight: 8,
             backgroundColor: Colors.grey[300],
             valueColor:
-                AlwaysStoppedAnimation<Color>(Colors.green), // Color verde
+                const AlwaysStoppedAnimation<Color>(Colors.green), // Color verde
           ),
         ),
         const SizedBox(height: 10),
@@ -467,7 +474,7 @@ class GappedRectanglePainter extends CustomPainter {
       ..strokeWidth = strokeWidth;
 
     canvas.drawLine(
-      Offset(0, 0),
+      const Offset(0, 0),
       Offset((size.width - gapSizeHorizontal) / 2, 0),
       paint,
     );
@@ -489,7 +496,7 @@ class GappedRectanglePainter extends CustomPainter {
     );
 
     canvas.drawLine(
-      Offset(0, 0),
+      const Offset(0, 0),
       Offset(0, (size.height - gapSizeVertical) / 2),
       paint,
     );

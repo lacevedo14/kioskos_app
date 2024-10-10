@@ -65,6 +65,5 @@ final appRouter = GoRouter(
         code:state.pathParameters['code']
       ),
     ),
-
   ]
 );

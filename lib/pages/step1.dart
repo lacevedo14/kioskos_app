@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:math';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'translations.dart';
 import 'package:device_info_plus/device_info_plus.dart'; // Este es el paquete que estás usando
@@ -17,7 +16,6 @@ class _Step1ScreenState extends State<Step1Screen> {
   String _selectedLanguage = 'ESP';
   bool _isStartButtonEnabled = false;
   bool _hasFetchedInformation = false;
-  SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   @override
   void initState() {
     super.initState();
@@ -26,18 +24,11 @@ class _Step1ScreenState extends State<Step1Screen> {
 
   Future<void> _initialize() async {
     // Cargar el valor de room desde SharedPreferences, si está guardado
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     room = await prefs.getString('scanCode') ?? '';
+  
 
-    if (deviceIdentifier.isNotEmpty &&
-        osVersion.isNotEmpty &&
-        deviceModel.isNotEmpty &&
-        deviceUUID.isNotEmpty &&
-        room.isNotEmpty) {
-      print('Valores existentes encontrados:');
-      print('deviceIdentifier: $deviceIdentifier');
-      print('osVersion: $osVersion');
-      print('deviceModel: $deviceModel');
-      print('deviceUUID: $deviceUUID');
+    if (room.isNotEmpty) {
       print('room: $room');
 
       setState(() {
@@ -48,7 +39,6 @@ class _Step1ScreenState extends State<Step1Screen> {
       _resetGlobalVariables();
       await _loadLanguagePreference();
       await _loadOrGenerateUUID();
-      await _getDeviceInformation();
     }
   }
 
@@ -80,6 +70,7 @@ class _Step1ScreenState extends State<Step1Screen> {
       deviceUUID = iosInfo.identifierForVendor ?? '';
       print('iOS Device UUID: $deviceUUID'); // Print añadido
     }
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('device_uuid', deviceUUID);
   }
 
@@ -101,8 +92,7 @@ class _Step1ScreenState extends State<Step1Screen> {
       print(
           'iOS Info: deviceIdentifier = $deviceIdentifier, osVersion = $osVersion, deviceModel = $deviceModel');
     }
-
-    // Guardar en SharedPreferences
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('device_identifier', deviceIdentifier);
     await prefs.setString('os_version', osVersion);
     await prefs.setString('device_model', deviceModel);

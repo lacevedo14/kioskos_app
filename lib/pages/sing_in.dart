@@ -76,7 +76,6 @@ class MyLoginFormState extends State<MyLoginForm> {
   String dropdownValue = '';
   final ApiService _apiService = ApiService();
   late Future<List<TypeDocuments>> list;
-   SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   @override
   void initState() {
     super.initState();
@@ -174,7 +173,9 @@ class MyLoginFormState extends State<MyLoginForm> {
                               loginForm.isLoading = false;
                               if (response['success']) {
                                 patient.patient = response['patient'];
-                                await prefs.setString('idPatient', response['patient']['id']);
+
+                                SharedPreferences prefs = await SharedPreferences.getInstance();
+                                await prefs.setInt('idPatient',patient.patient!.id as int);
                                 context.go('/entry-page');
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(

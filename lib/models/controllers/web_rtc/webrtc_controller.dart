@@ -39,7 +39,6 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   late Room _room;
   final ApiService _apiService = ApiService();
   final _remoteParticipantSubscriptions = <StreamSubscription>[];
-  SharedPreferencesAsync  prefs = SharedPreferencesAsync();
   
   Future<void> initializeWebRtc() async {
     await TwilioProgrammableVideo.debug(dart: true, native: true);
@@ -55,6 +54,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
     var trackId = const Uuid().v4();
     final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('room', dataAppoiment['room']);
     if (dataAppoiment['success']) {
       var connectOptions = ConnectOptions(
