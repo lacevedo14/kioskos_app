@@ -1,8 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'measurement_screen.dart';
-import 'step1.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'translations.dart';
 
 class Step3Screen extends StatefulWidget {

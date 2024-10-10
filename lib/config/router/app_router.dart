@@ -6,6 +6,11 @@ final appRouter = GoRouter(
   routes: [
 
     GoRoute(
+      path: '/survey',
+      builder: (context, state) =>  SurveyScreen(),
+    ),
+
+    GoRoute(
       path: '/',
       builder: (context, state) => const Home(),
     ),
@@ -48,6 +53,17 @@ final appRouter = GoRouter(
     GoRoute(
       path: '/step3',
       builder: (context, state) => const Step3Screen(),
+    ),
+    GoRoute(
+      path: '/generate-code',
+      builder: (context, state) => const GeneratePaymentCode(),
+    ),
+    GoRoute(
+      path: '/view-code/:code',
+      name: 'view-code',
+      builder: (context, state) =>  ViewCodePayment(
+        code:state.pathParameters['code']
+      ),
     ),
 
   ]

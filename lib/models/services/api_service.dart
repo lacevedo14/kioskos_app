@@ -103,8 +103,7 @@ class ApiService {
     final response = await http.post(Uri.parse('$_baseUrl/booth-code-payments'));
     final jsonResponse = json.decode(response.body);
     if (response.statusCode == 200) {
-       await prefs.setString('paymentcode', jsonResponse['payment_code']);
-      return {"success": true, "code": jsonResponse['payment_code'], "message": jsonResponse['Registro guardado correctamente']};
+      return {"success": true, "code": jsonResponse['payment_code'], "message": jsonResponse['message']};
     } else {
       return {"success": false, "message": response.body};
     }

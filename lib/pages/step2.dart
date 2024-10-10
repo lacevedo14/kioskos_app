@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'step3.dart';
-import 'step1.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'translations.dart'; // Importa las traducciones
+import 'translations.dart';
 
 class Step2Screen extends StatefulWidget {
   const Step2Screen({Key? key}) : super(key: key);

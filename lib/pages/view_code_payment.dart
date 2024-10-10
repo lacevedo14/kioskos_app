@@ -1,21 +1,25 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_videocall/models/services/api_service.dart';
 import 'package:flutter_videocall/pages/translations.dart';
 import 'package:go_router/go_router.dart';
 
-class GeneratePaymentCode extends StatefulWidget {
-   const GeneratePaymentCode({super.key});
+class ViewCodePayment extends StatefulWidget {
+   String? code;
+   ViewCodePayment({super.key, this.code});
+
   @override
-  State<GeneratePaymentCode> createState() => _GeneratePaymentCode();
+  State<ViewCodePayment> createState() => _ViewCodePaymentState();
 }
 
-class _GeneratePaymentCode extends State<GeneratePaymentCode> {
+class _ViewCodePaymentState extends State<ViewCodePayment> {
+ 
   final String _selectedLanguage = 'ESP';
- bool enabled = false;
+  String? paymentCode;
+
   @override
   Widget build(BuildContext context) {
-    final size = MediaQuery.of(context).size;
-    return Scaffold(
+     final code = widget.code; 
+     final size = MediaQuery.of(context).size;
+        return Scaffold(
       appBar: AppBar(
         title: const Text(''),
       ),
@@ -26,20 +30,25 @@ class _GeneratePaymentCode extends State<GeneratePaymentCode> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                height: size.height * 0.2,
+                height: size.height * 0.2,  
                 decoration: const BoxDecoration(
                     image: DecorationImage(
-                  image: AssetImage('assets/logo_egd.png'),
-                  fit: BoxFit.scaleDown,
-                )),
+                        image: AssetImage('assets/logo_egd.png'),
+                        fit: BoxFit.scaleDown)),
               ),
               const SizedBox(height: 20),
               Text(
-                translations[_selectedLanguage]!['payment_tittle']!,
+                translations[_selectedLanguage]!['code_view']!,
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 20),
+              Text(
+                code ?? 'no se ve mi codigo de pago ',
+                textAlign: TextAlign.center,
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+               const SizedBox(height: 20),
               SizedBox(
                   width: double.infinity,
                   child: Column(
@@ -50,31 +59,14 @@ class _GeneratePaymentCode extends State<GeneratePaymentCode> {
                           disabledColor: Colors.grey,
                           elevation: 0,
                           color: Colors.indigo,
-                          onPressed:enabled ?null : () async {
-                              setState(() {
-                                enabled = true;
-                              }); 
-                            final ApiService _apiService = ApiService();
-                            final data = await _apiService.getPaymentCode();
-                            if (data['success']) {
-                              context.goNamed('view-code',
-                                  pathParameters: {'code': data['code']});
-                            } else {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(content: Text(data['message'])),
-                              );
-                            }
-                              setState(() {
-                                enabled = true;
-                              });
-                          },
                           child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 50, vertical: 15),
                               child: Text(
-                                translations[_selectedLanguage]!['trigger']!,
-                                style: const TextStyle(color: Colors.white),
-                              ))),
+                                translations[_selectedLanguage]!['next']!,
+                                style: TextStyle(color: Colors.white),
+                              )),
+                          onPressed: ()  => context.go('/')),
                       const SizedBox(height: 20),
                     ],
                   )),
