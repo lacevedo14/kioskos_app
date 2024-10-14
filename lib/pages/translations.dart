@@ -58,6 +58,9 @@ Map<String, Map<String, String>> translations = {
     'consult_survey':'How do you rate the quality of the consultation',
     'assistant_survey':'How did you feel about the assistant',
     'doctor_survey':'Recommend the doctor',
+    'continue':'Continue',
+    'coment':'Comment',
+    'survey':'Survey',
   },
   'ESP': {
     'welcome': '¡Bienvenido!',
@@ -116,8 +119,11 @@ Map<String, Map<String, String>> translations = {
     'code_view':'Su codigo del pago es:',
     'connection_survey':'Calidad de la conexión',
     'consult_survey':'Como valora la calidad de la consulta',
-    'assitant_survey':'Como le pareció el asistente',
+    'assitant_survey':'Como le pareció el asistencia',
     'doctor_survey':'Recomienda al doctor',
+    'continue':'Continuar',
+    'coment':'Comentario',
+    'survey':'Encuesta',
   },
   'PT': {
     'welcome': 'Bem-vindo!',
@@ -170,5 +176,8 @@ Map<String, Map<String, String>> translations = {
     'consult_survey':'Como avalia a qualidade da consulta',
     'assistant_survey':'Como você se sentiu sobre o assistente',
     'doctor_survey':'Recomendar o médico',
+    'continue':'Continuar',
+    'coment':'Comentário',
+    'survey':'Encuesta',
   },
 };

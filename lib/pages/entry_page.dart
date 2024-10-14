@@ -9,6 +9,7 @@ class EntryPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final patientForm = Provider.of<PatientProvider>(context);
+    final size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Sala de espera'),
@@ -19,8 +20,17 @@ class EntryPage extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
+              Container(
+                height: size.height * 0.2,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                  image: AssetImage('assets/logo_egd.png'),
+                  fit: BoxFit.scaleDown,
+                )),
+              ),
+              const SizedBox(height: 20),
               Text(
-                'Bienvendio  ${patientForm.patient?.patientName}',
+                'Bienvendio ${patientForm.patient?.patientName}',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               const SizedBox(height: 20),

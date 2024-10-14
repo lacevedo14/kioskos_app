@@ -11,7 +11,7 @@ final appRouter = GoRouter(
     ),
 
     GoRoute(
-      path: '/',
+      path: '/home',
       builder: (context, state) => const Home(),
     ),
 
@@ -64,6 +64,10 @@ final appRouter = GoRouter(
       builder: (context, state) =>  ViewCodePayment(
         code:state.pathParameters['code']
       ),
+    ),
+    GoRoute(
+      path: '/',
+      builder: (context, state) => const SurveyScreen(),
     ),
   ]
 );

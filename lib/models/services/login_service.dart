@@ -5,7 +5,7 @@ import 'package:flutter_videocall/models/entities/entities.dart';
 import 'package:http/http.dart' as http;
 
 class LoginService extends ChangeNotifier {
-  final String _baseUrl = 'http://192.168.1.6:8000/api';
+  final String _baseUrl = 'http://192.168.0.108:8000/api';
 
   bool isLoading = true;
   Future loginUser(data) async {

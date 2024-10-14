@@ -95,7 +95,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
           preferredSize: const Size.fromHeight(60.0),
           child: AppBar(
             automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFF3A598F),
+            backgroundColor: const Color.fromARGB(255, 243, 244, 245),
             elevation: 0,
             title: Center(
               child: FittedBox(
@@ -104,7 +104,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'assets/images/logo-elite-footer_65-1.png',
+                      'assets/logo_egd.png',
                       height: 35,
                       fit: BoxFit.contain,
                     ),
@@ -265,11 +265,12 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
   void _stopTimer() {
     if (_timer != null) {
       _timer!.cancel();
-      setState(() {
+       //setState(() {
         _isRunning = false;
         _startTime = 0;
         print('DEBUG: _StartStopButtonWithTimerState: Timer detenido'); // DEBUG
-      });
+      //});
+     
     }
   }
 

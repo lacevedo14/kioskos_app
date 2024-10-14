@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'translations.dart';
-import 'package:device_info_plus/device_info_plus.dart'; // Este es el paquete que estás usando
 import 'device_info_storage.dart'; // Importar el archivo con las variables globales
 
 class Step1Screen extends StatefulWidget {
@@ -25,7 +24,7 @@ class _Step1ScreenState extends State<Step1Screen> {
   Future<void> _initialize() async {
     // Cargar el valor de room desde SharedPreferences, si está guardado
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    room = await prefs.getString('scanCode') ?? '';
+    room = prefs.getString('scanCode') ?? '';
   
 
     if (room.isNotEmpty) {
@@ -38,15 +37,10 @@ class _Step1ScreenState extends State<Step1Screen> {
     } else {
       _resetGlobalVariables();
       await _loadLanguagePreference();
-      await _loadOrGenerateUUID();
     }
   }
 
   void _resetGlobalVariables() {
-    deviceIdentifier = '';
-    osVersion = '';
-    deviceModel = '';
-    deviceUUID = '';
     room = '';
     secretk = '';
     _isStartButtonEnabled = false;
@@ -56,77 +50,6 @@ class _Step1ScreenState extends State<Step1Screen> {
   Future<void> _loadLanguagePreference() async {
     setState(() {
       _selectedLanguage = 'ESP';
-    });
-  }
-
-  Future<void> _loadOrGenerateUUID() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-    if (Theme.of(context).platform == TargetPlatform.android) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceUUID = androidInfo.id ?? '';
-      print('Android Device UUID: $deviceUUID'); // Print añadido
-    } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceUUID = iosInfo.identifierForVendor ?? '';
-      print('iOS Device UUID: $deviceUUID'); // Print añadido
-    }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('device_uuid', deviceUUID);
-  }
-
-  Future<void> _getDeviceInformation() async {
-    DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-
-    if (Theme.of(context).platform == TargetPlatform.android) {
-      AndroidDeviceInfo androidInfo = await deviceInfo.androidInfo;
-      deviceIdentifier = androidInfo.id;
-      osVersion = 'Android ${androidInfo.version.release}';
-      deviceModel = androidInfo.model;
-      print(
-          'Android Info: deviceIdentifier = $deviceIdentifier, osVersion = $osVersion, deviceModel = $deviceModel');
-    } else if (Theme.of(context).platform == TargetPlatform.iOS) {
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      deviceIdentifier = iosInfo.identifierForVendor!;
-      osVersion = 'iOS ${iosInfo.systemVersion}';
-      deviceModel = iosInfo.utsname.machine;
-      print(
-          'iOS Info: deviceIdentifier = $deviceIdentifier, osVersion = $osVersion, deviceModel = $deviceModel');
-    }
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('device_identifier', deviceIdentifier);
-    await prefs.setString('os_version', osVersion);
-    await prefs.setString('device_model', deviceModel);
-
-    // *** Guardar las variables en device_info_storage.dart ***
-    setState(() {
-      deviceIdentifier = deviceIdentifier;
-      osVersion = osVersion;
-      deviceModel = deviceModel;
-    });
-  }
-
-  void _showErrorBanner(String message) {
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      ScaffoldMessenger.of(context).showMaterialBanner(
-        MaterialBanner(
-          content: Center(
-            child: Text(
-              message,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          backgroundColor: Colors.red,
-          actions: const [
-            SizedBox.shrink(),
-          ],
-        ),
-      );
-
-      Future.delayed(const Duration(seconds: 8), () {
-        ScaffoldMessenger.of(context).hideCurrentMaterialBanner();
-      });
     });
   }
 

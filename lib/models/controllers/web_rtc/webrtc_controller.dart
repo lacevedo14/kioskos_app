@@ -53,13 +53,14 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
     //     bluetoothPreferred: bluetoothPreferred);
 
     var trackId = const Uuid().v4();
-    final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
+    //final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('room', dataAppoiment['room']);
-    if (dataAppoiment['success']) {
+   var dataRoom  =  prefs.getString('room');
+   var dataToken = prefs.getString('token');
+    if (dataRoom != '' && dataToken != '') {
       var connectOptions = ConnectOptions(
-        dataAppoiment['token'],
-        roomName: dataAppoiment['room'],
+        dataToken!,
+        roomName: dataRoom,
         preferredAudioCodecs: [OpusCodec()],
         audioTracks: [LocalAudioTrack(true, 'audio_track-$trackId')],
         dataTracks: [

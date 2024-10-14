@@ -1,14 +1,14 @@
 class Patient {
-    String id;
+    int id;
     String patientName;
 
     Patient({
-        this.id = '',
+        this.id = 0,
         this.patientName = '' ,
     });
 
      factory Patient.fromJson(Map<String, dynamic> json) => Patient(
-        id: json["id"].toString(),
+        id: json["id"],
         patientName: json["patient_name"],
     );
 

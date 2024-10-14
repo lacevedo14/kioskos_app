@@ -75,7 +75,7 @@ class _GeneratePaymentCode extends State<GeneratePaymentCode> {
                                 translations[_selectedLanguage]!['trigger']!,
                                 style: const TextStyle(color: Colors.white),
                               ))),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: 50),
                     ],
                   )),
             ],

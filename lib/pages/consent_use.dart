@@ -27,8 +27,12 @@ class _ConsentUseScreenState extends State<ConsentUseScreen> {
   void initState() {
     super.initState();
     _loadLanguagePreference();
-    _startListeningInternetConnection();
     _initialize();
+  }
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _startListeningInternetConnection();
   }
 
   Future<void> _loadLanguagePreference() async {
@@ -101,8 +105,8 @@ class _ConsentUseScreenState extends State<ConsentUseScreen> {
 
   Future<void> _getCodeScan() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var idPatient = await prefs.getString('idPatient') ?? '';
-    final data = await _apiService.getCodeScan(idPatient);
+    var idPatient = prefs.getInt('idPatient');
+    final data = await _apiService.getCodeScan(idPatient!);
     const secretKey = '4CF183-FF2816-44998A-9A3CD3-08BCAB-BF8C5D';
     if (data != null && data['face_scan_code'] != null) {
       secretk = secretKey; // Usamos '!' para indicar que no es null

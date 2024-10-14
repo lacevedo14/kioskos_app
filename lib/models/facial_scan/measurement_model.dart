@@ -2,6 +2,7 @@
 
 import 'dart:async';
 import 'dart:convert';
+import 'package:binah_flutter_sdk/bridge/bridge_vital_signs_factory.dart';
 import 'package:flutter/services.dart';
 import 'package:binah_flutter_sdk/images/image_validity.dart';
 import 'package:binah_flutter_sdk/license/license_details.dart';
@@ -49,7 +50,6 @@ import 'package:binah_flutter_sdk/alerts/alert_codes.dart';
 import 'package:binah_flutter_sdk/health_monitor_exception.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-
 class MeasurementModel extends ChangeNotifier
     implements SessionInfoListener, VitalSignsListener, ImageDataListener {
   String licenseKey = ''; // Inicializado vacío
@@ -72,7 +72,7 @@ class MeasurementModel extends ChangeNotifier
 
   Future<void> _loadLanguagePreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _selectedLanguage =  prefs.getString('language') ?? 'EN';
+    _selectedLanguage = prefs.getString('language') ?? 'EN';
   }
 
   Future<void> _loadLicenseKey() async {
@@ -83,7 +83,7 @@ class MeasurementModel extends ChangeNotifier
 
   Future<void> _loadErrorCauses() async {
     final String response =
-    await rootBundle.loadString('assets/error_data.json');
+        await rootBundle.loadString('assets/error_data.json');
     final List<dynamic> data = jsonDecode(response);
     for (var item in data) {
       errorCauses[item['code']] = item['cause'];
@@ -132,7 +132,7 @@ class MeasurementModel extends ChangeNotifier
   void onVitalSign(VitalSign vitalSign) {
     if (vitalSign.type == VitalSignTypes.pulseRate) {
       pulseRate =
-      "${translations[_selectedLanguage]!['pulse_rate']} ${(vitalSign as VitalSignPulseRate).value}";
+          "${translations[_selectedLanguage]!['pulse_rate']} ${(vitalSign as VitalSignPulseRate).value}";
     } else if (vitalSign.type == VitalSignTypes.oxygenSaturation) {
       print(
           "${translations[_selectedLanguage]!['oxygen_saturation']} ${(vitalSign as VitalSignOxygenSaturation).value}");
@@ -145,111 +145,108 @@ class MeasurementModel extends ChangeNotifier
 
   @override
   void onFinalResults(VitalSignsResults finalResults) async {
-    var pulseRateValue =
-        (finalResults.getResult(VitalSignTypes.pulseRate) as VitalSignPulseRate?)
-            ?.value ??
-            "N/A";
+       
+    var pulseRateValue = (finalResults.getResult(VitalSignTypes.pulseRate)
+                as VitalSignPulseRate?)
+            ?.value;
 
     var respirationRate = finalResults.getResult(VitalSignTypes.respirationRate)
-    as VitalSignRespirationRate?;
-    var respirationRateValue = respirationRate?.value ?? "N/A";
+        as VitalSignRespirationRate?;
+    var respirationRateValue = respirationRate?.value;
 
-    var bloodPressure =
-    finalResults.getResult(VitalSignTypes.bloodPressure) as VitalSignBloodPressure?;
+    var bloodPressure = finalResults.getResult(VitalSignTypes.bloodPressure)
+        as VitalSignBloodPressure?;
     var bloodPressureValue = bloodPressure != null
-        ? "${bloodPressure.value.systolic}/${bloodPressure.value.diastolic}"
-        : "N/A";
+        ? '{"systolic":${bloodPressure.value.systolic},"diastolic":${bloodPressure.value.diastolic}}'
+        : null;
 
     var hemoglobin = finalResults.getResult(VitalSignTypes.hemoglobin)
-    as VitalSignHemoglobin?;
-    var hemoglobinValue = hemoglobin?.value ?? "N/A";
+        as VitalSignHemoglobin?;
+    var hemoglobinValue = hemoglobin?.value;
 
     var hemoglobinA1C = finalResults.getResult(VitalSignTypes.hemoglobinA1C)
-    as VitalSignHemoglobinA1C?;
-    var hemoglobinA1CValue = hemoglobinA1C?.value ?? "N/A";
+        as VitalSignHemoglobinA1C?;
+    var hemoglobinA1CValue = hemoglobinA1C?.value;
 
-    var lfhf =
-    finalResults.getResult(VitalSignTypes.lfhf) as VitalSignLfhf?;
-    var lfhfValue = lfhf?.value ?? "N/A";
+    var lfhf = finalResults.getResult(VitalSignTypes.lfhf) as VitalSignLfhf?;
+    var lfhfValue = lfhf?.value;
 
-    var meanRri = finalResults.getResult(VitalSignTypes.meanRri)
-    as VitalSignMeanRri?;
-    var meanRriValue = meanRri?.value ?? "N/A";
+    var meanRri =
+        finalResults.getResult(VitalSignTypes.meanRri) as VitalSignMeanRri?;
+    var meanRriValue = meanRri?.value;
 
-    var pnsIndex = finalResults.getResult(VitalSignTypes.pnsIndex)
-    as VitalSignPnsIndex?;
-    var pnsIndexValue = pnsIndex?.value ?? "N/A";
+    var pnsIndex =
+        finalResults.getResult(VitalSignTypes.pnsIndex) as VitalSignPnsIndex?;
+    var pnsIndexValue = pnsIndex?.value;
 
-    var pnsZone = finalResults.getResult(VitalSignTypes.pnsZone)
-    as VitalSignPnsZone?;
-    var pnsZoneValue = pnsZone?.value ?? "N/A";
+    var pnsZone =
+        finalResults.getResult(VitalSignTypes.pnsZone) as VitalSignPnsZone?;
+    var pnsZoneValue = pnsZone?.value;
 
     var prq = finalResults.getResult(VitalSignTypes.prq) as VitalSignPrq?;
-    var prqValue = prq?.value ?? "N/A";
+    var prqValue = prq?.value;
 
-    var rmssd = finalResults.getResult(VitalSignTypes.rmssd)
-    as VitalSignRmssd?;
-    var rmssdValue = rmssd?.value ?? "N/A";
+    var rmssd = finalResults.getResult(VitalSignTypes.rmssd) as VitalSignRmssd?;
+    var rmssdValue = rmssd?.value;
 
     var rri = finalResults.getResult(VitalSignTypes.rri) as VitalSignRri?;
-    var rriValues =
-        rri?.value.map((v) => v.toString()).join(", ") ?? "N/A";
+    var rriValues = rri?.value.map((v) => v.toString()).join(", ");
 
     var sd1 = finalResults.getResult(VitalSignTypes.sd1) as VitalSignSd1?;
-    var sd1Value = sd1?.value ?? "N/A";
+    var sd1Value = sd1?.value;
 
     var sd2 = finalResults.getResult(VitalSignTypes.sd2) as VitalSignSd2?;
-    var sd2Value = sd2?.value ?? "N/A";
+    var sd2Value = sd2?.value;
 
     var sdnn = finalResults.getResult(VitalSignTypes.sdnn) as VitalSignSdnn?;
-    var sdnnValue = sdnn?.value ?? "N/A";
+    var sdnnValue = sdnn?.value;
 
-    var snsIndex = finalResults.getResult(VitalSignTypes.snsIndex)
-    as VitalSignSnsIndex?;
-    var snsIndexValue = snsIndex?.value ?? "N/A";
+    var snsIndex =
+        finalResults.getResult(VitalSignTypes.snsIndex) as VitalSignSnsIndex?;
+    var snsIndexValue = snsIndex?.value;
 
-    var snsZone = finalResults.getResult(VitalSignTypes.snsZone)
-    as VitalSignSnsZone?;
-    var snsZoneValue = snsZone?.value ?? "N/A";
+    var snsZone =
+        finalResults.getResult(VitalSignTypes.snsZone) as VitalSignSnsZone?;
+    var snsZoneValue = snsZone?.value;
 
     var stressLevel = finalResults.getResult(VitalSignTypes.stressLevel)
-    as VitalSignStressLevel?;
-    var stressLevelValue = stressLevel?.value ?? "N/A";
+        as VitalSignStressLevel?;
+    var stressLevelValue = stressLevel?.value;
 
     var stressIndex = finalResults.getResult(VitalSignTypes.stressIndex)
-    as VitalSignStressIndex?;
-    var stressIndexValue = stressIndex?.value ?? "N/A";
+        as VitalSignStressIndex?;
+    var stressIndexValue = stressIndex?.value;
 
     var wellnessIndex = finalResults.getResult(VitalSignTypes.wellnessIndex)
-    as VitalSignWellnessIndex?;
-    var wellnessIndexValue = wellnessIndex?.value ?? "N/A";
+        as VitalSignWellnessIndex?;
+    var wellnessIndexValue = wellnessIndex?.value;
 
     var wellnessLevel = finalResults.getResult(VitalSignTypes.wellnessLevel)
-    as VitalSignWellnessLevel?;
-    var wellnessLevelValue = wellnessLevel?.value ?? "N/A";
+        as VitalSignWellnessLevel?;
+    var wellnessLevelValue = wellnessLevel?.value;
 
     finalResultsString =
-    "${translations[_selectedLanguage]!['pulse_rate']} $pulseRateValue\n"
-        "Respiration Rate: $respirationRateValue\n"
-        "${translations[_selectedLanguage]!['blood_pressure']} $bloodPressureValue\n"
-        "${translations[_selectedLanguage]!['hemoglobin']} $hemoglobinValue\n"
-        "${translations[_selectedLanguage]!['hemoglobin_a1c']} $hemoglobinA1CValue\n"
-        "LF/HF: $lfhfValue\n"
-        "Mean RRi: $meanRriValue\n"
-        "PNS Index: $pnsIndexValue\n"
-        "${translations[_selectedLanguage]!['pns_zone']} $pnsZoneValue\n"
-        "PRQ: $prqValue\n"
-        "RMSSD: $rmssdValue\n"
-        "${translations[_selectedLanguage]!['rri_values']} $rriValues\n"
-        "SD1: $sd1Value\n"
-        "SD2: $sd2Value\n"
-        "SDNN: $sdnnValue\n"
-        "${translations[_selectedLanguage]!['sns_index']} $snsIndexValue\n"
-        "${translations[_selectedLanguage]!['sns_zone']} $snsZoneValue\n"
-        "${translations[_selectedLanguage]!['stress_level']} $stressLevelValue\n"
-        "${translations[_selectedLanguage]!['stress_index']} $stressIndexValue\n"
-        "${translations[_selectedLanguage]!['wellness_index']} $wellnessIndexValue\n"
-        "${translations[_selectedLanguage]!['wellness_level']} $wellnessLevelValue";
+        "heartRate: $pulseRateValue\n"
+        "breathingRate: $respirationRateValue\n"
+        "bloodPressure: $bloodPressureValue\n"
+        "hemoglobin: $hemoglobinValue\n"
+        "hemoglobinA1c $hemoglobinA1CValue\n"
+        "lfjf: $lfhfValue\n"
+        "meanRri: $meanRriValue\n"
+        "pnsIndex: $pnsIndexValue\n"
+        "pnsZone: $pnsZoneValue\n"
+        "prq: $prqValue\n"
+        "rmssd: $rmssdValue\n"
+        "pnsZone: $rriValues\n"
+        "sd1: $sd1Value\n"
+        "sd2: $sd2Value\n"
+        "sdnn: $sdnnValue\n"
+        "snsIndex: $snsIndexValue\n"
+        "snsZone: $snsZoneValue\n"
+        "stressLevel: $stressLevelValue\n"
+        "stressIndex: $stressIndexValue\n"
+        "wellnessIndex: $wellnessIndexValue\n"
+        "wellnessLevel: $wellnessLevelValue";
 
     notifyListeners();
   }
@@ -321,8 +318,7 @@ class MeasurementModel extends ChangeNotifier
           .withVitalSignsListener(this)
           .withSessionInfoListener(this)
           .build(LicenseDetails(licenseKey));
-          print('DEBUG:  $_session'); // DEBUG
-
+      print('DEBUG:  $_session'); // DEBUG
     } on HealthMonitorException catch (e) {
       final cause = getErrorCause(e.code);
       error = "Error: ${e.code} Cause: $cause";

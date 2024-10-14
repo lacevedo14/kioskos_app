@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_videocall/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
 
 class Home extends StatelessWidget {
@@ -7,14 +6,22 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.of(context).size;
     return Scaffold(
-        body: AuthBackground(
-            child: SingleChildScrollView(
-      child: Padding(
+        body:  Center(
+          child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
         child: Column(
           children: [
-            const SizedBox(height: 400),
+                          Container(
+                height: size.height * 0.2,
+                decoration: const BoxDecoration(
+                    image: DecorationImage(
+                  image: AssetImage('assets/logo_egd.png'),
+                  fit: BoxFit.scaleDown,
+                )),
+              ),
+              const SizedBox(height: 20),
             SizedBox(
                 width: double.infinity,
                 child: MaterialButton(
@@ -50,7 +57,7 @@ class Home extends StatelessWidget {
                       )),
                   onPressed: () => context.go('/sign-up'),
                 )),
-            const SizedBox(height: 20),
+            const SizedBox(height: 100),
             // SizedBox(
             //   width: double.infinity,
             //   child: MaterialButton(
@@ -72,6 +79,6 @@ class Home extends StatelessWidget {
           ],
         ),
       ),
-    )));
+    ));
   }
 }
