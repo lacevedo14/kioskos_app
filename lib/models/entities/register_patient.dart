@@ -9,13 +9,16 @@ class RegisterPatient {
     String lastName;
     String documentTypeId;
     String documentNumber;
-    DateTime? birthDate;
+    String? birthDate;
     String phone;
     String codPhone;
     String email;
     String gender;
     String isoCountry;
     String paymentCode;
+    String responsible;
+    String responsiblePhoneCode;
+    String responsiblePhone;
 
     RegisterPatient({
         this.firstName = '',
@@ -27,8 +30,11 @@ class RegisterPatient {
         this.codPhone  = '',
         this.email = '',
         this.gender  = '',
-        this.isoCountry = '',
+        this.isoCountry = 'VE',
         this.paymentCode = '',
+        this.responsible = '',
+        this.responsiblePhoneCode = '',
+        this.responsiblePhone = '',
     });
 
     factory RegisterPatient.fromJson(Map<String, dynamic> json) => RegisterPatient(
@@ -36,13 +42,16 @@ class RegisterPatient {
         lastName: json["last_name"],
         documentTypeId: json["document_type_id"],
         documentNumber: json["document_number"],
-        birthDate: DateTime.parse(json["birth_date"]),
+        birthDate: json["birth_date"],
         phone: json["phone"],
         codPhone: json["cod_phone"],
         email: json["email"],
         gender: json["gender"],
         isoCountry: json["iso_country"],
         paymentCode: json["payment_code"],
+        responsible: json["responsible"],
+        responsiblePhoneCode: json["responsible_phone_code"],
+        responsiblePhone: json["responsible_phone"],
     );
 
     Map<String, dynamic> toJson() => {
@@ -50,12 +59,16 @@ class RegisterPatient {
         "last_name": lastName,
         "document_type_id": documentTypeId,
         "document_number": documentNumber,
-        "birth_date": "${birthDate?.year.toString().padLeft(4, '0')}-${birthDate?.month.toString().padLeft(2, '0')}-${birthDate?.day.toString().padLeft(2, '0')}",
+        "birth_date": birthDate,
         "phone": phone,
         "cod_phone": codPhone,
         "email": email,
         "gender": gender,
         "iso_country": isoCountry,
         "payment_code": paymentCode,
+        "responsible": responsible,
+        "responsible_phone_code": responsiblePhoneCode,
+        "responsible_phone": responsiblePhone
+        
     };
 }

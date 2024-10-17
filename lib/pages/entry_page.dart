@@ -11,17 +11,15 @@ class EntryPage extends StatelessWidget {
     final patientForm = Provider.of<PatientProvider>(context);
     final size = MediaQuery.of(context).size;
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Sala de espera'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 25),
-        child: Center(
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 10),
           child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
-                height: size.height * 0.2,
+                height: size.height * 0.1,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
                   image: AssetImage('assets/logo_egd.png'),
@@ -35,42 +33,46 @@ class EntryPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               SizedBox(
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      MaterialButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        disabledColor: Colors.grey,
-                        elevation: 0,
-                        color: Colors.indigo,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
-                            child: const Text(
-                              'Ingresar',
-                              style: TextStyle(color: Colors.white),
-                            )),
-                        onPressed: () => context.go('/call-screen'),
-                      ),
-                      const SizedBox(height: 20),
-                      MaterialButton(
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10)),
-                        disabledColor: Colors.grey,
-                        elevation: 0,
-                        color: Colors.indigo,
-                        child: Container(
-                            padding: const EdgeInsets.symmetric(
-                                horizontal: 50, vertical: 15),
-                            child: const Text(
-                              'Scan Facial',
-                              style: TextStyle(color: Colors.white),
-                            )),
-                        onPressed: () => context.go('/use'),
-                      ),
-                    ],
-                  )),
+                width: size.width * 0.4,
+                child: ElevatedButton(
+                  onPressed: () => context.go('/call-screen'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text(
+                    'Ingresar',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: size.width * 0.4,
+                child: ElevatedButton(
+                  onPressed: () => context.go('/use'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 32, vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text(
+                    'Scan Facial',
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
             ],
           ),
         ),

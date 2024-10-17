@@ -2,7 +2,6 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:binah_flutter_sdk/bridge/bridge_vital_signs_factory.dart';
 import 'package:flutter/services.dart';
 import 'package:binah_flutter_sdk/images/image_validity.dart';
 import 'package:binah_flutter_sdk/license/license_details.dart';
@@ -148,66 +147,64 @@ class MeasurementModel extends ChangeNotifier
        
     var pulseRateValue = (finalResults.getResult(VitalSignTypes.pulseRate)
                 as VitalSignPulseRate?)
-            ?.value;
+            ?.value ?? 0;
 
     var respirationRate = finalResults.getResult(VitalSignTypes.respirationRate)
         as VitalSignRespirationRate?;
-    var respirationRateValue = respirationRate?.value;
+    var respirationRateValue = respirationRate?.value ?? 0;
 
     var bloodPressure = finalResults.getResult(VitalSignTypes.bloodPressure)
         as VitalSignBloodPressure?;
-    var bloodPressureValue = bloodPressure != null
-        ? '{"systolic":${bloodPressure.value.systolic},"diastolic":${bloodPressure.value.diastolic}}'
-        : null;
+    var bloodPressureValue = bloodPressure?.value.toString();
 
     var hemoglobin = finalResults.getResult(VitalSignTypes.hemoglobin)
         as VitalSignHemoglobin?;
-    var hemoglobinValue = hemoglobin?.value;
+    var hemoglobinValue = hemoglobin?.value ?? 0;
 
     var hemoglobinA1C = finalResults.getResult(VitalSignTypes.hemoglobinA1C)
         as VitalSignHemoglobinA1C?;
-    var hemoglobinA1CValue = hemoglobinA1C?.value;
+    var hemoglobinA1CValue = hemoglobinA1C?.value ?? 0;
 
     var lfhf = finalResults.getResult(VitalSignTypes.lfhf) as VitalSignLfhf?;
-    var lfhfValue = lfhf?.value;
+    var lfhfValue = lfhf?.value ?? 0;
 
     var meanRri =
         finalResults.getResult(VitalSignTypes.meanRri) as VitalSignMeanRri?;
-    var meanRriValue = meanRri?.value;
+    var meanRriValue = meanRri?.value ?? 0;
 
     var pnsIndex =
         finalResults.getResult(VitalSignTypes.pnsIndex) as VitalSignPnsIndex?;
-    var pnsIndexValue = pnsIndex?.value;
+    var pnsIndexValue = pnsIndex?.value ?? 0;
 
     var pnsZone =
         finalResults.getResult(VitalSignTypes.pnsZone) as VitalSignPnsZone?;
-    var pnsZoneValue = pnsZone?.value;
+    var pnsZoneValue = pnsZone?.value ?? 0;
 
     var prq = finalResults.getResult(VitalSignTypes.prq) as VitalSignPrq?;
-    var prqValue = prq?.value;
+    var prqValue = prq?.value ?? 0;
 
     var rmssd = finalResults.getResult(VitalSignTypes.rmssd) as VitalSignRmssd?;
-    var rmssdValue = rmssd?.value;
+    var rmssdValue = rmssd?.value ?? 0;
 
     var rri = finalResults.getResult(VitalSignTypes.rri) as VitalSignRri?;
-    var rriValues = rri?.value.map((v) => v.toString()).join(", ");
+    var rriValues = rri?.value.toString();
 
     var sd1 = finalResults.getResult(VitalSignTypes.sd1) as VitalSignSd1?;
-    var sd1Value = sd1?.value;
+    var sd1Value = sd1?.value ?? 0;
 
     var sd2 = finalResults.getResult(VitalSignTypes.sd2) as VitalSignSd2?;
-    var sd2Value = sd2?.value;
+    var sd2Value = sd2?.value ?? 0;
 
     var sdnn = finalResults.getResult(VitalSignTypes.sdnn) as VitalSignSdnn?;
-    var sdnnValue = sdnn?.value;
+    var sdnnValue = sdnn?.value ?? 0;
 
     var snsIndex =
         finalResults.getResult(VitalSignTypes.snsIndex) as VitalSignSnsIndex?;
-    var snsIndexValue = snsIndex?.value;
+    var snsIndexValue = snsIndex?.value ?? 0;
 
     var snsZone =
         finalResults.getResult(VitalSignTypes.snsZone) as VitalSignSnsZone?;
-    var snsZoneValue = snsZone?.value;
+    var snsZoneValue = snsZone?.value ?? 0;
 
     var stressLevel = finalResults.getResult(VitalSignTypes.stressLevel)
         as VitalSignStressLevel?;
@@ -215,11 +212,11 @@ class MeasurementModel extends ChangeNotifier
 
     var stressIndex = finalResults.getResult(VitalSignTypes.stressIndex)
         as VitalSignStressIndex?;
-    var stressIndexValue = stressIndex?.value;
+    var stressIndexValue = stressIndex?.value ?? 0;
 
     var wellnessIndex = finalResults.getResult(VitalSignTypes.wellnessIndex)
         as VitalSignWellnessIndex?;
-    var wellnessIndexValue = wellnessIndex?.value;
+    var wellnessIndexValue = wellnessIndex?.value ?? 0;
 
     var wellnessLevel = finalResults.getResult(VitalSignTypes.wellnessLevel)
         as VitalSignWellnessLevel?;
@@ -318,7 +315,6 @@ class MeasurementModel extends ChangeNotifier
           .withVitalSignsListener(this)
           .withSessionInfoListener(this)
           .build(LicenseDetails(licenseKey));
-      print('DEBUG:  $_session'); // DEBUG
     } on HealthMonitorException catch (e) {
       final cause = getErrorCause(e.code);
       error = "Error: ${e.code} Cause: $cause";
@@ -367,6 +363,7 @@ class MeasurementModel extends ChangeNotifier
     error = null;
     warning = null;
     pulseRate = null;
+    imageData = null;
     notifyListeners();
   }
 

@@ -3,23 +3,22 @@ import 'package:flutter_videocall/pages/translations.dart';
 import 'package:go_router/go_router.dart';
 
 class ViewCodePayment extends StatefulWidget {
-   String? code;
-   ViewCodePayment({super.key, this.code});
+  String? code;
+  ViewCodePayment({super.key, this.code});
 
   @override
   State<ViewCodePayment> createState() => _ViewCodePaymentState();
 }
 
 class _ViewCodePaymentState extends State<ViewCodePayment> {
- 
   final String _selectedLanguage = 'ESP';
   String? paymentCode;
 
   @override
   Widget build(BuildContext context) {
-     final code = widget.code; 
-     final size = MediaQuery.of(context).size;
-        return Scaffold(
+    final code = widget.code;
+    final size = MediaQuery.of(context).size;
+    return Scaffold(
       appBar: AppBar(
         title: const Text(''),
       ),
@@ -30,7 +29,7 @@ class _ViewCodePaymentState extends State<ViewCodePayment> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
               Container(
-                height: size.height * 0.2,  
+                height: size.height * 0.2,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
                         image: AssetImage('assets/logo_egd.png'),
@@ -44,11 +43,11 @@ class _ViewCodePaymentState extends State<ViewCodePayment> {
               ),
               const SizedBox(height: 20),
               Text(
-                code ?? 'no se ve mi codigo de pago ',
+                code ?? 'Se requiere un código',
                 textAlign: TextAlign.center,
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
-               const SizedBox(height: 20),
+              const SizedBox(height: 20),
               SizedBox(
                   width: double.infinity,
                   child: Column(
@@ -66,7 +65,7 @@ class _ViewCodePaymentState extends State<ViewCodePayment> {
                                 translations[_selectedLanguage]!['next']!,
                                 style: TextStyle(color: Colors.white),
                               )),
-                          onPressed: ()  => context.go('/')),
+                          onPressed: () => context.go('/home')),
                       const SizedBox(height: 20),
                     ],
                   )),

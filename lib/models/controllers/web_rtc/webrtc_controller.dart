@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/models/entities/videocall.dart';
 import 'package:flutter_videocall/models/entities/webrtc.dart';
-import 'package:flutter_videocall/models/services/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_programmable_video/twilio_programmable_video.dart';
 import 'package:uuid/uuid.dart';
@@ -19,7 +18,7 @@ final initRemote = CallState(
     isCalling: false,
     id: '',
     widget: const Scaffold(
-        appBar: null, body: Center(child: Text('Espera Doctor'))));
+        appBar: null, body: Center(child: Text('Espere un momento buscando doctor.'))));
 
 class CallStateNotifier extends StateNotifier<VideoCall> {
   CallStateNotifier()
@@ -37,56 +36,59 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   bool bluetoothPreferred = false;
   late CameraCapturer _cameraCapturer;
   late Room _room;
-  final ApiService _apiService = ApiService();
   final _remoteParticipantSubscriptions = <StreamSubscription>[];
-  
+  final Completer<Room> _completer = Completer<Room>();
+
   Future<void> initializeWebRtc() async {
-    await TwilioProgrammableVideo.debug(dart: true, native: true);
-    await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
+   
+      await TwilioProgrammableVideo.debug(dart: true, native: true);
+      await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
 
-    final sources = await CameraSource.getSources();
-    _cameraCapturer = CameraCapturer(
-      sources.firstWhere((source) => source.isFrontFacing),
-    );
-    // await TwilioProgrammableVideo.setAudioSettings(
-    //     speakerphoneEnabled: speakerphoneEnabled,
-    //     bluetoothPreferred: bluetoothPreferred);
-
-    var trackId = const Uuid().v4();
-    //final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-   var dataRoom  =  prefs.getString('room');
-   var dataToken = prefs.getString('token');
-    if (dataRoom != '' && dataToken != '') {
-      var connectOptions = ConnectOptions(
-        dataToken!,
-        roomName: dataRoom,
-        preferredAudioCodecs: [OpusCodec()],
-        audioTracks: [LocalAudioTrack(true, 'audio_track-$trackId')],
-        dataTracks: [
-          LocalDataTrack(
-            DataTrackOptions(name: 'data_track-$trackId'),
-          )
-        ],
-        videoTracks: [LocalVideoTrack(true, _cameraCapturer)],
-        enableNetworkQuality: true,
-        networkQualityConfiguration: NetworkQualityConfiguration(
-          remote: NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
-        ),
-        enableDominantSpeaker: true,
+      final sources = await CameraSource.getSources();
+      _cameraCapturer = CameraCapturer(
+        sources.firstWhere((source) => source.isFrontFacing),
       );
+      await TwilioProgrammableVideo.setAudioSettings(
+          speakerphoneEnabled: speakerphoneEnabled,
+          bluetoothPreferred: bluetoothPreferred);
 
-      _room = await TwilioProgrammableVideo.connect(connectOptions);
+      var trackId = const Uuid().v4();
+      //final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var dataRoom  =  prefs.getString('room');
+      var dataToken = prefs.getString('token');
+      if (dataRoom != '' && dataToken != '') {
+        var connectOptions = ConnectOptions(
+          dataToken!,
+          roomName: dataRoom,
+          preferredAudioCodecs: [OpusCodec()],
+          audioTracks: [LocalAudioTrack(true, 'audio_track-$trackId')],
+          dataTracks: [
+            LocalDataTrack(
+              DataTrackOptions(name: 'data_track-$trackId'),
+            )
+          ],
+          videoTracks: [LocalVideoTrack(true, _cameraCapturer)],
+          enableNetworkQuality: true,
+          networkQualityConfiguration: NetworkQualityConfiguration(
+            remote: NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+          ),
+          enableDominantSpeaker: true,
+        );
 
-      if (_room != null) {
-        _room.onConnected.listen(_onConnected);
-        _room.onConnectFailure.listen(_onConnectFailure);
-        _room.onDisconnected.listen(_onDisconnected);
+        _room = await TwilioProgrammableVideo.connect(connectOptions);
+
+        if (_room != null) {
+          _room.onConnected.listen(_onConnected);
+          _room.onConnectFailure.listen(_onConnectFailure);
+          _room.onDisconnected.listen(_onDisconnected);
+        }
       }
+      _completer.future;
+        // _room.onConnected.listen(_onConnected);
+        // _room.onConnectFailure.listen(_onConnectFailure);
 
-      // _room.onConnected.listen(_onConnected);
-      // _room.onConnectFailure.listen(_onConnectFailure);
-    }
+    
   }
 
   Future<void> disconnect() async {
@@ -167,6 +169,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
   void _onConnectFailure(RoomConnectFailureEvent event) {
     log('Failed to connect to room ${event.room.name} with exception: ${event.exception}');
+    _completer.completeError(event.exception ?? const TwilioException(TwilioException.unknownException, 'An unknown connection failure occurred.'));
   }
 
   void _onParticipantConnected(RoomParticipantConnectedEvent event) {

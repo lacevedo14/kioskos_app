@@ -6,7 +6,8 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String _baseUrl = 'http://192.168.0.108:8000/api';
+  final String _baseUrl = 'http://192.168.1.6:8000/api';
+
   Future<List<TypeDocuments>> getTypePRovider() async {
     final response = await http.get(Uri.parse('$_baseUrl/document-types'));
 
@@ -67,14 +68,23 @@ class ApiService {
   }
 
   Future getCodeScan(int patientId) async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('tokenGeneral');
+
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd').add_Hms();
     final String hour = formatter.format(now);
 
-    final response = await http.post(Uri.parse('$_baseUrl/face-scans'), body: {
-      "patient_id": patientId.toString(),
-      "date": hour,
-    });
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+    final response = await http.post(Uri.parse('$_baseUrl/face-scans'),
+        headers: headers,
+        body: jsonEncode({
+          "patient_id": patientId.toString(),
+          "date": hour,
+        }));
     final jsonResponse = json.decode(response.body);
 
     if (response.statusCode == 200) {
@@ -92,35 +102,50 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final idPatient = prefs.getInt('idPatient');
     final scanCode = prefs.getString('scanCode');
-    Map<String, dynamic> resultsJson = {};
-    for (var result in data) {
-      String label = result['subtitleText']!;
-      String englishLabel = label.replaceAll(' ', '');
-      resultsJson[englishLabel] = {"value": result['mainText']!};
-    }
+    final token = prefs.getString('tokenGeneral');
+
     final DateTime now = DateTime.now();
     final DateFormat formatter = DateFormat('yyyy-MM-dd');
     final DateFormat hourformatter = DateFormat.Hms();
     final String formatted = formatter.format(now);
     final String hour = hourformatter.format(now);
-    String dataSend = json.encode({"vitals": resultsJson, "room": scanCode});
 
-    final response = await http.post(Uri.parse('$_baseUrl/face-scan-results'), body: {
+    Map<String, dynamic> resultsJson = {};
+    if (data.isNotEmpty) {
+      for (var result in data) {
+        String label = result['subtitleText']!;
+        String englishLabel = label.replaceAll(' ', '');
+        resultsJson[englishLabel] = {"value": result['mainText']!};
+      }
+    } 
+
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+    final finalData = jsonEncode({
       "patient_id": idPatient.toString(),
       "scan_id": id.toString(),
       "appointment_date": formatted,
       "appointment_hour": hour,
-      "results": dataSend,
-      
+      "results": {"vitals": resultsJson, "room": scanCode},
     });
+
+    final response = await http.post(Uri.parse('$_baseUrl/face-scan-results'),
+        headers: headers, body: finalData);
+
     final jsonResponse = json.decode(response.body);
 
     if (response.statusCode == 200) {
-       SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setInt('idDoctor',jsonResponse['doctor_id'] as int);
-        await prefs.setInt('idAppointment',jsonResponse['appointment_id'] as int);
-        await prefs.setString('room', jsonResponse['room']);
-        await prefs.setString('token', jsonResponse['token']);
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+
+      await prefs.setInt(
+          'idAppointment', jsonResponse['appointment_id'] as int);
+      await prefs.setString('room', jsonResponse['room']);
+      await prefs.setString('token', jsonResponse['token_twilio']);
+      if (jsonResponse['doctor_id'] != null) {
+        await prefs.setInt('idDoctor', jsonResponse['doctor_id'] as int);
+      }
 
       return {"success": true, "message": jsonResponse['message']};
     } else {
@@ -133,6 +158,8 @@ class ApiService {
         await http.post(Uri.parse('$_baseUrl/booth-code-payments'));
     final jsonResponse = json.decode(response.body);
     if (response.statusCode == 200) {
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      await prefs.setString('codePayment', jsonResponse['payment_code']);
       return {
         "success": true,
         "code": jsonResponse['payment_code'],
@@ -159,21 +186,27 @@ class ApiService {
 
   Future sendDataSurvey(data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    final idDoctor = prefs.getInt('idDoctor');    
+    final idDoctor = prefs.getInt('idDoctor');
     final idAppointment = prefs.getInt('idAppointment');
     final room = prefs.getString('room');
+    final token = prefs.getString('tokenGeneral');
 
-    final response = await http.post(Uri.parse('$_baseUrl/face-scan-results'), body: {
-      "doctor_id": idDoctor.toString(),
-      "appointment_id": idAppointment.toString(),
-      "room": room,
-      "connection_quality": data.connection_quality,
-      "consultation_quality": data.consultation_quality,
-      "assistance_quality": data.assistance_quality,
-      "comment": data.comment,
-      "recommended_doctor": "Y"
-      
-    });
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+    final response = await http.post(Uri.parse('$_baseUrl/face-scan-results'),
+        headers: headers,
+        body: jsonEncode({
+          "doctor_id": idDoctor.toString(),
+          "appointment_id": idAppointment.toString(),
+          "room": room,
+          "connection_quality": data['connection_quality'],
+          "consultation_quality": data['consultation_quality'],
+          "assistance_quality": data['assistance_quality'],
+          "comment": data['comment'],
+          "recommended_doctor": data['recommended_doctor']
+        }));
     final jsonResponse = json.decode(response.body);
 
     if (response.statusCode == 200) {

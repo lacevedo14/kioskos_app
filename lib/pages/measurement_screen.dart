@@ -112,7 +112,6 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                     Text(
                       translations[_selectedLanguage]!['face_scan']!,
                       style: const TextStyle(
-                        color: Colors.white,
                         fontSize: 14,
                       ),
                       textAlign: TextAlign.center,

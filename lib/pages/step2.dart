@@ -37,10 +37,16 @@ class _Step2ScreenState extends State<Step2Screen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(65.0),
         child: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.indigo,
-            elevation: 0,
-            title: const Text('')),
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Center(
+            child: Image.asset(
+              'assets/logo_egd.png',
+              height: 50,
+            ),
+          ),
+        ),
       ),
       body: Center(
         // Centramos el contenido en la pantalla
@@ -62,21 +68,21 @@ class _Step2ScreenState extends State<Step2Screen> {
                       onChanged: (value) => _toggleCheckbox(0, value),
                     ),
                     CheckboxListTile(
-                      title:
-                          Text(translations[_selectedLanguage]!['lighting']!),
+                      title: Text(
+                          translations[_selectedLanguage]!['quiet_place']!),
                       value: _isChecked[1],
                       controlAffinity: ListTileControlAffinity.trailing,
                       checkColor: Colors.white,
-                      activeColor: const Color(0xFF3A598F),
+                      activeColor: Color(0xFF3A598F),
                       onChanged: (value) => _toggleCheckbox(1, value),
                     ),
                     CheckboxListTile(
-                      title:
-                          Text(translations[_selectedLanguage]!['movement']!),
+                      title: Text(
+                          translations[_selectedLanguage]!['avoid_movement']!),
                       value: _isChecked[2],
                       controlAffinity: ListTileControlAffinity.trailing,
                       checkColor: Colors.white,
-                      activeColor: const Color(0xFF3A598F),
+                      activeColor: Color(0xFF3A598F),
                       onChanged: (value) => _toggleCheckbox(2, value),
                     ),
                     CheckboxListTile(
@@ -102,8 +108,8 @@ class _Step2ScreenState extends State<Step2Screen> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFFFF3A2C),
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),
@@ -117,12 +123,12 @@ class _Step2ScreenState extends State<Step2Screen> {
                       onPressed: _isChecked.contains(false)
                           ? null
                           : () {
-                              context.go('/step3');
+                              context.go('/facial-scan');
                             },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.indigo,
-                        padding:
-                            const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(10)),
                       ),

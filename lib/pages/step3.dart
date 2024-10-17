@@ -38,10 +38,16 @@ class _Step3ScreenState extends State<Step3Screen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(65.0),
         child: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: Colors.indigo,
-            elevation: 0,
-            title: Text('')),
+        automaticallyImplyLeading: false,
+        backgroundColor: const Color.fromARGB(255, 246, 247, 248),
+        elevation: 0,
+        title: Center(
+          child: Image.asset(
+            'assets/logo_egd.png',
+            height: 50,
+          ),
+        ),
+      ),
       ),
       body: Center(
         // Centramos el contenido en la pantalla

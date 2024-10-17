@@ -6,9 +6,9 @@ import 'package:flutter_videocall/models/providers/register_patient_providers.da
 import 'package:flutter_videocall/ui/input_decorations.dart';
 import 'package:flutter_videocall/widgets/widgets.dart';
 import 'package:go_router/go_router.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
-
-
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignUp extends StatelessWidget {
   const SignUp({super.key});
@@ -21,7 +21,7 @@ class SignUp extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           leading: IconButton(
-              onPressed: () => context.go('/'),
+              onPressed: () => context.go('/home'),
               icon: const Icon(
                 Icons.arrow_back,
                 color: Colors.white,
@@ -62,10 +62,13 @@ class MyCustomForm extends StatefulWidget {
 
 class MyCustomFormState extends State<MyCustomForm> {
   String dropdownValue = '';
+  String? birthDate;
   late Future<List<TypeDocuments>> list;
   late Future<List<Opcion>> gender;
   late Future<List<CodePhone>> codes;
   final ApiService _apiService = ApiService();
+  final TextEditingController _birthDateController = TextEditingController(
+      text: DateFormat('yyyy-MM-dd').format(DateTime.now()));
   @override
   void initState() {
     super.initState();
@@ -74,18 +77,23 @@ class MyCustomFormState extends State<MyCustomForm> {
     codes = _apiService.getCodePhone();
   }
 
-  _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context) async {
     final DateTime now = DateTime.now();
-    final DateTime lastYear = DateTime(now.year - 1);
+
+    final DateFormat formatter = DateFormat('yyyy-MM-dd');
 
     final DateTime? picked = await showDatePicker(
       context: context,
       initialDate: now,
-      firstDate: lastYear,
+      firstDate: DateTime(1900),
       lastDate: now,
     );
     if (picked != null) {
-      return picked;
+      final String formatted = formatter.format(picked);
+      setState(() {
+        birthDate = formatted;
+        _birthDateController.text = formatted;
+      });
     }
   }
 
@@ -94,13 +102,15 @@ class MyCustomFormState extends State<MyCustomForm> {
     final registerForm = Provider.of<RegisterPatientProvider>(context);
     final patientFinal = Provider.of<PatientProvider>(context);
     final patient = registerForm.patient;
+
     return Form(
         key: registerForm.registerKey,
         child: Padding(
             padding: const EdgeInsets.all(15.0),
             child: SingleChildScrollView(
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextFormField(
                     validator: (value) {
@@ -174,39 +184,18 @@ class MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // TextButton(
-                  //     onPressed: () => _selectDate(context),
-                  //     child: Text('Fecha de Nacimiento')),
-                  // InputDatePickerFormField(
-                  //   keyboardType: TextInputType.datetime,
-                  //   fieldHintText: 'Fecha de Nacimiento',
-                  //   fieldLabelText: 'Fecha de Nacimiento',
-                  //   firstDate: DateTime(1910),
-                  //   lastDate: DateTime(2025),
-                  //   initialDate: DateTime.now(),
-                  //   autofocus: false,
-                  // ),
-                  GestureDetector(
-                    onTap: () {
-                      DateTime date = _selectDate(context);
-                      patient.birthDate = date;
+                  TextFormField(
+                    keyboardType: TextInputType.datetime,
+                    readOnly: true,
+                    onTap: () async {
+                      await _selectDate(context);
+                      patient.birthDate = birthDate;
                     },
-                    child: AbsorbPointer(
-                        child: TextFormField(
-                      keyboardType: TextInputType.datetime,
-                      onChanged: (value) =>
-                          patient.birthDate = value as DateTime?,
-                      validator: (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Ingrese un Fecha válida';
-                        }
-                        return null;
-                      },
-                      decoration: InputDecorations.authInputDecoration(
-                        hintText: 'Fecha de Nacimiento',
-                        labelText: 'Fecha de Nacimiento',
-                      ),
-                    )),
+                    controller: _birthDateController,
+                    decoration: InputDecorations.authInputDecoration(
+                      hintText: 'Seleccione una fecha',
+                      labelText: 'Fecha de Nacimiento',
+                    ),
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
@@ -312,45 +301,54 @@ class MyCustomFormState extends State<MyCustomForm> {
                     ),
                   ),
                   const SizedBox(height: 30),
-                           SizedBox(
-                  width: double.infinity,
-                  child: MaterialButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      disabledColor: Colors.grey,
-                      elevation: 0,
-                      color: Colors.indigo,
+                  ElevatedButton(
                       onPressed: registerForm.isLoading
                           ? null
                           : () async {
                               FocusScope.of(context).unfocus();
 
                               if (!registerForm.isValidForm()) return;
-                                registerForm.isLoading = true;
-                                final loginService = LoginService();
-                                //final Future<String> response = registerForm.loginUser();
-                                Map response =
-                                    await loginService.registerPatient(registerForm);
-                                    registerForm.isLoading = false;
-                                if (response['success']) {
-                                  patientFinal.patient = response['patient'];
-                                  context.go('/entry-page');
-                                } else {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text(response['message'])),
-                                  );
+                              registerForm.isLoading = true;
+                              final loginService = LoginService();
+                              //final Future<String> response = registerForm.loginUser();
+                              Map response = await loginService
+                                  .registerPatient(registerForm);
+                              registerForm.isLoading = false;
+                              if (response['success']) {
+                                patientFinal.patient = response['patient'];
+                                SharedPreferences prefs =
+                                    await SharedPreferences.getInstance();
+                                await prefs.setInt(
+                                    'idPatient', patientFinal.patient!.id);
+                                context.go('/entry-page');
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(content: Text(response['message'])),
+                                );
                               }
                               //print(response);
                               registerForm.isLoading = false;
                               //Navigator.pushReplacementNamed(context, 'home');
                             },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.indigo,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 5),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10)),
+                      ),
                       child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
-                          child: Text(
-                            registerForm.isLoading ? 'Espere' : 'Enviar',
-                            style: const TextStyle(color: Colors.white),
-                          ))))
+                              horizontal: 10, vertical: 10),
+                          child: registerForm.isLoading
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                  strokeWidth: 3,
+                                )
+                              : const Text(
+                                  'Ingresar',
+                                  style: TextStyle(color: Colors.white),
+                                ))),
                 ],
               ),
             )));

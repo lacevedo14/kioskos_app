@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_videocall/models/entities/entities.dart';
-import 'package:flutter_videocall/models/services/login_service.dart';
 import 'package:flutter_videocall/models/providers/login_form_provider.dart';
 import 'package:flutter_videocall/models/providers/patient_provider.dart';
 import 'package:flutter_videocall/models/services/services.dart';
@@ -26,7 +25,7 @@ class SignIn extends StatelessWidget {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           leading: IconButton(
-              onPressed: () => context.go('/'),
+              onPressed: () => context.go('/home'),
               icon: const Icon(
                 Icons.arrow_back,
                 color: Colors.white,
@@ -87,14 +86,15 @@ class MyLoginFormState extends State<MyLoginForm> {
     final loginService = Provider.of<LoginService>(context);
     final loginForm = Provider.of<LoginFormProvider>(context);
     final patient = Provider.of<PatientProvider>(context);
-    // Build a Form widget using the _formKey created above.
+
     return Form(
         key: loginForm.formKey,
         autovalidateMode: AutovalidateMode.onUserInteraction,
         child: Padding(
           padding: const EdgeInsets.all(15.0),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               FutureBuilder(
                 future: list,
@@ -152,47 +152,53 @@ class MyLoginFormState extends State<MyLoginForm> {
                 ),
               ),
               const SizedBox(height: 30),
-              SizedBox(
-                  width: double.infinity,
-                  child: MaterialButton(
-                      shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10)),
-                      disabledColor: Colors.grey,
-                      elevation: 0,
-                      color: Colors.indigo,
-                      onPressed: loginForm.isLoading
-                          ? null
-                          : () async {
-                              FocusScope.of(context).unfocus();
+              ElevatedButton(
+                  onPressed: loginForm.isLoading
+                      ? null
+                      : () async {
+                          FocusScope.of(context).unfocus();
 
-                              if (!loginForm.isValidForm()) return;
-                              loginForm.isLoading = true;
-                              //final Future<String> response = loginForm.loginUser();
-                              Map response =
-                                  await loginService.loginUser(loginForm);
-                              loginForm.isLoading = false;
-                              if (response['success']) {
-                                patient.patient = response['patient'];
-
-                                SharedPreferences prefs = await SharedPreferences.getInstance();
-                                await prefs.setInt('idPatient',patient.patient!.id as int);
-                                context.go('/entry-page');
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(response['message'])),
-                                );
-                              }
-                              //print(response);
-                              loginForm.isLoading = false;
-                              //Navigator.pushReplacementNamed(context, 'home');
-                            },
-                      child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 50, vertical: 15),
-                          child: Text(
-                            loginForm.isLoading ? 'Espere' : 'Ingresar',
-                            style: const TextStyle(color: Colors.white),
-                          ))))
+                          if (!loginForm.isValidForm()) return;
+                          loginForm.isLoading = true;
+                          //final Future<String> response = loginForm.loginUser();
+                          Map response =
+                              await loginService.loginUser(loginForm);
+                          loginForm.isLoading = false;
+                          if (response['success']) {
+                            patient.patient = response['patient'];
+                            SharedPreferences prefs =
+                                await SharedPreferences.getInstance();
+                            await prefs.setInt(
+                                'idPatient', patient.patient!.id);
+                            context.go('/entry-page');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(content: Text(response['message'])),
+                            );
+                          }
+                          //print(response);
+                          loginForm.isLoading = false;
+                          //Navigator.pushReplacementNamed(context, 'home');
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.indigo,
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 10),
+                      child: loginForm.isLoading
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            )
+                          : const Text(
+                              'Ingresar',
+                              style: TextStyle(color: Colors.white),
+                            ))),
             ],
           ),
         ));

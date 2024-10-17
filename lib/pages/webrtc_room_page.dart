@@ -12,19 +12,59 @@ class CallScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final callState = ref.watch(callStateProvider);
     final patientForm = providers.Provider.of<PatientProvider>(context);
-    ref.read(callStateProvider).idPatient = patientForm.patient!.id as String?;
+    ref.read(callStateProvider).idPatient = patientForm.patient!.id.toString();
     if (callState.finishCall) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/'));
+      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/survey'));
     }
     return Scaffold(
-      appBar: null,
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Center(
+          child: Image.asset(
+            'assets/logo_egd.png',
+            height: 50,
+          ),
+        ),
+      ),
+      body: Stack(
         children: [
-          _videoWidget(context, callState.localVideoInfo.widget as Widget,
-              callState.localVideoInfo.id),
-          _videoWidget(context, callState.remoteVideoInfo.widget as Widget,
-              callState.remoteVideoInfo.id),
+          Positioned.fill(
+            child: AspectRatio(
+              aspectRatio: 16 / 9,
+              child: callState.remoteVideoInfo.widget,
+            ),
+          ),
+          Positioned(
+            top: 30,
+            left: 10,
+            child: Text(
+              callState.remoteVideoInfo.id,
+              style: const TextStyle(color: Color.fromARGB(255, 15, 15, 15),fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Container(
+              width: 200,
+              height: 200,
+              child: AspectRatio(
+                aspectRatio: 16 / 9,
+                child: callState.localVideoInfo.widget,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Text(
+              callState.localVideoInfo.id,
+              style: const TextStyle(color: Color.fromARGB(255, 15, 15, 15),fontSize: 12, fontWeight: FontWeight.bold),
+            ),
+          ),
         ],
       ),
       floatingActionButton: FloatingActionButton(

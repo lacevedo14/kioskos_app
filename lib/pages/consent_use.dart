@@ -142,11 +142,16 @@ class _ConsentUseScreenState extends State<ConsentUseScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(65.0),
         child: AppBar(
-          automaticallyImplyLeading: false,
-          backgroundColor: const Color(0xFF3A598F),
-          elevation: 0,
-          title: const Text(''),
+        automaticallyImplyLeading: false,
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Center(
+          child: Image.asset(
+            'assets/logo_egd.png',
+            height: 50,
+          ),
         ),
+      ),
       ),
       body: Stack(
         children: [

@@ -25,7 +25,6 @@ class _Step1ScreenState extends State<Step1Screen> {
     // Cargar el valor de room desde SharedPreferences, si está guardado
     SharedPreferences prefs = await SharedPreferences.getInstance();
     room = prefs.getString('scanCode') ?? '';
-  
 
     if (room.isNotEmpty) {
       print('room: $room');
@@ -60,10 +59,16 @@ class _Step1ScreenState extends State<Step1Screen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(65.0),
         child: AppBar(
-            automaticallyImplyLeading: false,
-            backgroundColor: const Color(0xFF3A598F),
-            elevation: 0,
-            title: const Text('')),
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Center(
+            child: Image.asset(
+              'assets/logo_egd.png',
+              height: 50,
+            ),
+          ),
+        ),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -78,7 +83,7 @@ class _Step1ScreenState extends State<Step1Screen> {
                   Text(
                     translations[_selectedLanguage]!['description'] ??
                         'Description',
-                    style: const TextStyle(fontSize: 16, color: Colors.grey),
+                    style: const TextStyle(fontSize: 16),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 30),
