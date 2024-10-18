@@ -192,16 +192,14 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         }
         return {'mainText': 'N/A', 'subtitleText': parts[0]};
       }).toList();
-      print(
-          'DEBUG: MeasurementScreen: Parsed Results - $parsedResults');
-          SharedPreferences prefs = await SharedPreferences.getInstance();
-           var idScan =  prefs.getInt('idScan') ?? '';
-          final data = await _apiService.sendResultScan(idScan,parsedResults); 
-          
-             SchedulerBinding.instance.addPostFrameCallback((_) {
-      print('DEBUG: MeasurementScreen: Navegando a ResultsScreen');
-    context.go('/entry-page');
-    });// DEBUG
+ 
+      SharedPreferences prefs = await SharedPreferences.getInstance();
+      var idScan =  prefs.getInt('idScan') ?? '';
+      await _apiService.sendResultScan(idScan,parsedResults); 
+        
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        context.go('/entry-page');
+      });// DEBUG
     }
   
   

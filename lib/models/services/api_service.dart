@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter_videocall/models/entities/entities.dart';
+import 'package:flutter_videocall/models/providers/doctor_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
@@ -117,7 +118,7 @@ class ApiService {
         String englishLabel = label.replaceAll(' ', '');
         resultsJson[englishLabel] = {"value": result['mainText']!};
       }
-    } 
+    }
 
     Map<String, String> headers = {
       "Content-Type": "application/json",
@@ -145,6 +146,9 @@ class ApiService {
       await prefs.setString('token', jsonResponse['token_twilio']);
       if (jsonResponse['doctor_id'] != null) {
         await prefs.setInt('idDoctor', jsonResponse['doctor_id'] as int);
+      } else {
+        DoctorCheckerProvider doctorCheck = DoctorCheckerProvider();
+        doctorCheck.startChecking();
       }
 
       return {"success": true, "message": jsonResponse['message']};
@@ -195,7 +199,7 @@ class ApiService {
       "Content-Type": "application/json",
       "Authorization": "Bearer $token",
     };
-    final response = await http.post(Uri.parse('$_baseUrl/face-scan-results'),
+    final response = await http.post(Uri.parse('$_baseUrl/survey-responses'),
         headers: headers,
         body: jsonEncode({
           "doctor_id": idDoctor.toString(),

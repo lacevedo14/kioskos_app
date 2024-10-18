@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_videocall/models/providers/doctor_provider.dart';
 import 'package:flutter_videocall/models/providers/patient_provider.dart';
+import 'package:flutter_videocall/pages/loading_page.dart';
 import 'package:flutter_videocall/states/state_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as providers;
@@ -12,6 +14,10 @@ class CallScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final callState = ref.watch(callStateProvider);
     final patientForm = providers.Provider.of<PatientProvider>(context);
+    final doctorCheck = providers.Provider.of<DoctorCheckerProvider>(context);
+    
+    if( doctorCheck.idDoctor == 0 ) return LoadingPage();
+
     ref.read(callStateProvider).idPatient = patientForm.patient!.id.toString();
     if (callState.finishCall) {
       WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/survey'));
