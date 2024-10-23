@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/models/entities/videocall.dart';
 import 'package:flutter_videocall/models/entities/webrtc.dart';
+import 'package:flutter_videocall/models/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_programmable_video/twilio_programmable_video.dart';
 import 'package:uuid/uuid.dart';
@@ -18,7 +19,8 @@ final initRemote = CallState(
     isCalling: false,
     id: '',
     widget: const Scaffold(
-        appBar: null, body: Center(child: Text('Espere un momento buscando doctor.'))));
+        appBar: null,
+        body: Center(child: Text('Espere un momento buscando doctor.'))));
 
 class CallStateNotifier extends StateNotifier<VideoCall> {
   CallStateNotifier()
@@ -28,7 +30,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
             finishCall: false,
             audioSetting: true)) {
     debugPrint('$tag: initialized');
-    initializeWebRtc();
+    initDoctor();
+    //initializeWebRtc();
   }
 
   static const tag = 'WebRtcController';
@@ -37,58 +40,64 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   late CameraCapturer _cameraCapturer;
   late Room _room;
   final _remoteParticipantSubscriptions = <StreamSubscription>[];
-  final Completer<Room> _completer = Completer<Room>();
+
+  Future<void> initDoctor() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var doctorId = prefs.getInt('idDoctor') ?? '';
+    if (doctorId != 0) {
+      updateDoctorId(doctorId as int);
+      initializeWebRtc();
+    } else {
+      startChecking();
+    }
+  }
 
   Future<void> initializeWebRtc() async {
-   
-      await TwilioProgrammableVideo.debug(dart: true, native: true);
-      await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
+    await TwilioProgrammableVideo.debug(dart: true, native: true);
+    //await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
 
-      final sources = await CameraSource.getSources();
-      _cameraCapturer = CameraCapturer(
-        sources.firstWhere((source) => source.isFrontFacing),
+    final sources = await CameraSource.getSources();
+    _cameraCapturer = CameraCapturer(
+      sources.firstWhere((source) => source.isFrontFacing),
+    );
+    await TwilioProgrammableVideo.setAudioSettings(
+        speakerphoneEnabled: speakerphoneEnabled,
+        bluetoothPreferred: bluetoothPreferred);
+
+    var trackId = const Uuid().v4();
+    //final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    var dataRoom = prefs.getString('room') ?? '';
+    var dataToken = prefs.getString('token') ?? '';
+    if (dataRoom != '' && dataToken != '') {
+      var connectOptions = ConnectOptions(
+        dataToken,
+        roomName: dataRoom,
+        preferredAudioCodecs: [OpusCodec()],
+        audioTracks: [LocalAudioTrack(true, 'audio_track-$trackId')],
+        dataTracks: [
+          LocalDataTrack(
+            DataTrackOptions(name: 'data_track-$trackId'),
+          )
+        ],
+        videoTracks: [LocalVideoTrack(true, _cameraCapturer)],
+        enableNetworkQuality: true,
+        networkQualityConfiguration: NetworkQualityConfiguration(
+          remote: NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
+        ),
+        enableDominantSpeaker: true,
       );
-      await TwilioProgrammableVideo.setAudioSettings(
-          speakerphoneEnabled: speakerphoneEnabled,
-          bluetoothPreferred: bluetoothPreferred);
 
-      var trackId = const Uuid().v4();
-      //final dataAppoiment = await _apiService.getRoom(state.getIdPatient);
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      var dataRoom  =  prefs.getString('room');
-      var dataToken = prefs.getString('token');
-      if (dataRoom != '' && dataToken != '') {
-        var connectOptions = ConnectOptions(
-          dataToken!,
-          roomName: dataRoom,
-          preferredAudioCodecs: [OpusCodec()],
-          audioTracks: [LocalAudioTrack(true, 'audio_track-$trackId')],
-          dataTracks: [
-            LocalDataTrack(
-              DataTrackOptions(name: 'data_track-$trackId'),
-            )
-          ],
-          videoTracks: [LocalVideoTrack(true, _cameraCapturer)],
-          enableNetworkQuality: true,
-          networkQualityConfiguration: NetworkQualityConfiguration(
-            remote: NetworkQualityVerbosity.NETWORK_QUALITY_VERBOSITY_MINIMAL,
-          ),
-          enableDominantSpeaker: true,
-        );
+      _room = await TwilioProgrammableVideo.connect(connectOptions);
 
-        _room = await TwilioProgrammableVideo.connect(connectOptions);
-
-        if (_room != null) {
-          _room.onConnected.listen(_onConnected);
-          _room.onConnectFailure.listen(_onConnectFailure);
-          _room.onDisconnected.listen(_onDisconnected);
-        }
+      if (_room != null) {
+        _room.onConnected.listen(_onConnected);
+        _room.onConnectFailure.listen(_onConnectFailure);
+        _room.onDisconnected.listen(_onDisconnected);
       }
-      _completer.future;
-        // _room.onConnected.listen(_onConnected);
-        // _room.onConnectFailure.listen(_onConnectFailure);
-
-    
+    }
+    // _room.onConnected.listen(_onConnected);
+    // _room.onConnectFailure.listen(_onConnectFailure);
   }
 
   Future<void> disconnect() async {
@@ -99,7 +108,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
   void _onDisconnected(RoomDisconnectedEvent event) {
     log('[ APPDEBUG ] ConferenceRoom._onDisconnected  ${event.room.name}');
-    state = VideoCall.copyWith(
+    state = state.copyWith(
+        idDoctor: state.idDoctor,
         localVideoInfo: initLocal,
         remoteVideoInfo: initRemote,
         audioSetting: false,
@@ -121,7 +131,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
     final localAudioTrack = tracks.isEmpty ? null : tracks[0].localAudioTrack;
 
-    state = VideoCall.copyWith(
+    state = state.copyWith(
+        idDoctor: state.idDoctor,
         localVideoInfo: CallState(
             isCalling: true,
             id: room.localParticipant!.identity,
@@ -150,7 +161,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
             final widget = event.remoteVideoTrack.widget();
             final id = event.remoteParticipant.identity;
-            state = VideoCall.copyWith(
+            state = state.copyWith(
+              idDoctor: state.idDoctor,
               localVideoInfo: state.localVideoInfo,
               audioSetting: state.audioSetting,
               finishCall: false,
@@ -169,7 +181,6 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
   void _onConnectFailure(RoomConnectFailureEvent event) {
     log('Failed to connect to room ${event.room.name} with exception: ${event.exception}');
-    _completer.completeError(event.exception ?? const TwilioException(TwilioException.unknownException, 'An unknown connection failure occurred.'));
   }
 
   void _onParticipantConnected(RoomParticipantConnectedEvent event) {
@@ -181,10 +192,11 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
         final widget = event.remoteVideoTrack.widget();
         final id = event.remoteParticipant.identity;
-        state = VideoCall.copyWith(
+        state = state.copyWith(
+          idDoctor: state.idDoctor,
           localVideoInfo: state.localVideoInfo,
           audioSetting: state.audioSetting,
-            finishCall: false,
+          finishCall: false,
           remoteVideoInfo: CallState(
               isCalling: true,
               id: id,
@@ -198,7 +210,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
 
   void _onParticipantDisconnected(RoomParticipantDisconnectedEvent event) {
     log('Participant ${event.remoteParticipant.identity} has left the room');
-    state = VideoCall.copyWith(
+    state = state.copyWith(
+        idDoctor: state.idDoctor,
         localVideoInfo: initLocal,
         remoteVideoInfo: initRemote,
         finishCall: true,
@@ -213,10 +226,47 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
       return;
     }
     await localAudioTrack.enable(!localAudioTrack.isEnabled);
-    state = VideoCall.copyWith(
+    state = state.copyWith(
+        idDoctor: state.idDoctor,
         localVideoInfo: state.localVideoInfo,
         remoteVideoInfo: state.remoteVideoInfo,
         finishCall: false,
         audioSetting: localAudioTrack.isEnabled);
+  }
+
+  Timer? timer;
+
+  void startChecking() {
+    const duration = Duration(seconds: 45);
+    timer = Timer.periodic(duration, (timer) async {
+      await checkDoctorValue();
+    });
+  }
+
+  checkDoctorValue() async {
+    final ApiService _apiService = ApiService();
+    Map data = await _apiService.getCheckDoctor();
+    if (data['success']) {
+      state = state.copyWith(
+          localVideoInfo: state.localVideoInfo,
+          idDoctor: data['doctor_id'],
+          remoteVideoInfo: state.remoteVideoInfo,
+          finishCall: false,
+          audioSetting: state.audioSetting);
+      initializeWebRtc();
+      //nameDoctor = data['nombre'];
+
+      timer?.cancel();
+      print('Valor encontrado!');
+    }
+  }
+
+  void updateDoctorId(int newId) {
+    state = state.copyWith(
+        localVideoInfo: state.localVideoInfo,
+        idDoctor: newId,
+        remoteVideoInfo: state.remoteVideoInfo,
+        finishCall: false,
+        audioSetting: state.audioSetting);
   }
 }

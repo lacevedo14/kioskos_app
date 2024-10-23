@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_videocall/models/providers/doctor_provider.dart';
 import 'package:flutter_videocall/models/providers/patient_provider.dart';
-import 'package:flutter_videocall/pages/loading_page.dart';
 import 'package:flutter_videocall/states/state_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as providers;
@@ -14,13 +12,11 @@ class CallScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final callState = ref.watch(callStateProvider);
     final patientForm = providers.Provider.of<PatientProvider>(context);
-    final doctorCheck = providers.Provider.of<DoctorCheckerProvider>(context);
-    
-    if( doctorCheck.idDoctor == 0 ) return LoadingPage();
 
     ref.read(callStateProvider).idPatient = patientForm.patient!.id.toString();
     if (callState.finishCall) {
-      WidgetsBinding.instance.addPostFrameCallback((_) => context.go('/survey'));
+      WidgetsBinding.instance
+          .addPostFrameCallback((_) => context.go('/survey'));
     }
     return Scaffold(
       backgroundColor: Colors.white,
@@ -30,7 +26,7 @@ class CallScreen extends ConsumerWidget {
         elevation: 0,
         title: Center(
           child: Image.asset(
-            'assets/logo_egd.png',
+            'assets/images/logo_planimedic.png',
             height: 50,
           ),
         ),
@@ -48,7 +44,10 @@ class CallScreen extends ConsumerWidget {
             left: 10,
             child: Text(
               callState.remoteVideoInfo.id,
-              style: const TextStyle(color: Color.fromARGB(255, 15, 15, 15),fontSize: 16, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 15, 15, 15),
+                  fontSize: 16,
+                  fontWeight: FontWeight.bold),
             ),
           ),
           Positioned(
@@ -68,7 +67,10 @@ class CallScreen extends ConsumerWidget {
             right: 10,
             child: Text(
               callState.localVideoInfo.id,
-              style: const TextStyle(color: Color.fromARGB(255, 15, 15, 15),fontSize: 12, fontWeight: FontWeight.bold),
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 15, 15, 15),
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold),
             ),
           ),
         ],
@@ -101,7 +103,7 @@ class CallScreen extends ConsumerWidget {
             left: 20,
             child: Text(name,
                 style: const TextStyle(
-                    color: Colors.indigo,
+                    color: Color(0xFF2087C9),
                     fontSize: 20.0,
                     fontWeight: FontWeight.bold)),
           ),
@@ -109,7 +111,7 @@ class CallScreen extends ConsumerWidget {
             top: 60,
             right: 20,
             child: Icon(Icons.signal_cellular_alt_rounded,
-                size: 40, color: Colors.indigo),
+                size: 40, color: Color(0xFF2087C9)),
           ),
         ],
       ),

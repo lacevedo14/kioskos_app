@@ -37,7 +37,7 @@ class _HeaderIcon extends StatelessWidget {
           )
           // Container(
           //   decoration: const BoxDecoration(
-          //     image: DecorationImage(image: AssetImage('assets/logo_egd.png'),fit: BoxFit.scaleDown)
+          //     image: DecorationImage(image: AssetImage('assets/images/logo_planimedic.png'),fit: BoxFit.scaleDown)
           //   ),
           // ),
           ),

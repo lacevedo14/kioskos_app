@@ -58,7 +58,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
   }
 
   Future<void> _sendResults() async {
-    print('Guardando resultados localmente...');
+    print('Guardando resultados vacios...');
 
     SharedPreferences prefs = await SharedPreferences.getInstance();
     var idScan = prefs.getInt('idScan') ?? '';
@@ -96,7 +96,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
           elevation: 0,
           title: Center(
             child: Image.asset(
-              'assets/logo_egd.png',
+              'assets/images/logo_planimedic.png',
               height: 50,
             ),
           ),
@@ -174,7 +174,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                             context.go('/call-screen');
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.indigo,
+                            backgroundColor: Color(0xFF2087C9),
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 15, vertical: 10),
                             shape: RoundedRectangleBorder(
@@ -199,7 +199,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                           context.go('/call-screen');
                         },
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.indigo,
+                          backgroundColor: Color(0xFF2087C9),
                           padding: const EdgeInsets.symmetric(
                               horizontal: 15, vertical: 10),
                         ),

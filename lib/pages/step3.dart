@@ -38,16 +38,16 @@ class _Step3ScreenState extends State<Step3Screen> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(65.0),
         child: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: const Color.fromARGB(255, 246, 247, 248),
-        elevation: 0,
-        title: Center(
-          child: Image.asset(
-            'assets/logo_egd.png',
-            height: 50,
+          automaticallyImplyLeading: false,
+          backgroundColor: const Color.fromARGB(255, 246, 247, 248),
+          elevation: 0,
+          title: Center(
+            child: Image.asset(
+              'assets/images/logo_planimedic.png',
+              height: 50,
+            ),
           ),
         ),
-      ),
       ),
       body: Center(
         // Centramos el contenido en la pantalla
@@ -108,7 +108,7 @@ class _Step3ScreenState extends State<Step3Screen> {
                               context.go('/facial-scan');
                             },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
+                        backgroundColor: Color(0xFF2087C9),
                         padding:
                             EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                         shape: RoundedRectangleBorder(

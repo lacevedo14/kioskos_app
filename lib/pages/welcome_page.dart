@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_videocall/models/services/api_service.dart';
 import 'package:flutter_videocall/pages/translations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -36,10 +35,10 @@ class _WelcomePage extends State<WelcomePage> {
             crossAxisAlignment: CrossAxisAlignment.center,
             children: <Widget>[
               Container(
-                height: size.height * 0.1,
+                height: size.height * 0.2,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
-                  image: AssetImage('assets/logo_egd.png'),
+                  image: AssetImage('assets/images/logo_planimedic.png'),
                   fit: BoxFit.scaleDown,
                 )),
               ),
@@ -51,9 +50,14 @@ class _WelcomePage extends State<WelcomePage> {
               ),
               const SizedBox(height: 30),
               ElevatedButton(
-                onPressed: () => context.go('/home'),
+                onPressed: () async {
+                  SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                  await prefs.clear();
+                  context.go('/home');
+                },
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: Color(0xFF2087C9),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(

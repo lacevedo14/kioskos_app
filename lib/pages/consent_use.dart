@@ -29,6 +29,7 @@ class _ConsentUseScreenState extends State<ConsentUseScreen> {
     _loadLanguagePreference();
     _initialize();
   }
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -142,16 +143,16 @@ class _ConsentUseScreenState extends State<ConsentUseScreen> {
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(65.0),
         child: AppBar(
-        automaticallyImplyLeading: false,
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: Center(
-          child: Image.asset(
-            'assets/logo_egd.png',
-            height: 50,
+          automaticallyImplyLeading: false,
+          backgroundColor: Colors.white,
+          elevation: 0,
+          title: Center(
+            child: Image.asset(
+              'assets/images/logo_planimedic.png',
+              height: 50,
+            ),
           ),
         ),
-      ),
       ),
       body: Stack(
         children: [
@@ -244,7 +245,7 @@ class _ConsentUseScreenState extends State<ConsentUseScreen> {
                             }
                           : null, // Deshabilitar el botón si no hay conexión o no se obtuvo el secretKey
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.indigo,
+                        backgroundColor: Color(0xFF2087C9),
                         foregroundColor: Colors.white, // Texto blanco
                         padding: const EdgeInsets.symmetric(
                             horizontal: 32, vertical: 16),

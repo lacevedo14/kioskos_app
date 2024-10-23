@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class CallState {
-  final bool isCalling;
+  final bool isCalling ;
   final String id;
   final Widget? widget;
   final int? networkLevel;

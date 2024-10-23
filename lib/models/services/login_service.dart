@@ -6,7 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginService extends ChangeNotifier {
-  final String _baseUrl = 'http://192.168.1.6:8000/api';
+  final String _baseUrl = 'https://citamedicas.site/api_kioskos/api';
 
   bool isLoading = true;
   Future loginUser(data) async {

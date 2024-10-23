@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
 import 'package:flutter_videocall/models/services/api_service.dart';
 import 'package:go_router/go_router.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'translations.dart';
 
 class SurveyScreen extends StatefulWidget {
@@ -27,6 +28,11 @@ class SurveyScreenState extends State<SurveyScreen> {
   bool enabled = false;
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -35,7 +41,7 @@ class SurveyScreenState extends State<SurveyScreen> {
         elevation: 0,
         title: Center(
           child: Image.asset(
-            'assets/logo_egd.png',
+            'assets/images/logo_planimedic.png',
             height: 50,
           ),
         ),
@@ -258,18 +264,18 @@ class SurveyScreenState extends State<SurveyScreen> {
                             enabled = true;
                           });
                           final ApiService _apiService = ApiService();
-                          // final data = await _apiService.sendDataSurvey({
-                          //   "connection_quality": connectionSurvey,
-                          //   "consultation_quality": consultSurvey,
-                          //   "assistance_quality": assitantSurvey,
-                          //   "comment": coment,
-                          //   "recommended_doctor": recomenntDoctor
-                          // });
-
+                          final data = await _apiService.sendDataSurvey({
+                            "recommendationAttention": recommendationAttention,
+                            "medicalInformation": medicalInformation,
+                            "qualityConsultation": qualityConsultation,
+                            "comfortable": comfortable,
+                            "satisfaction": satisfaction
+                          });
+                         
                           context.go('/final');
                         },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.indigo,
+                    backgroundColor: Color(0xFF2087C9),
                     padding: const EdgeInsets.symmetric(
                         horizontal: 32, vertical: 16),
                     shape: RoundedRectangleBorder(

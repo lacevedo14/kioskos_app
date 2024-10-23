@@ -32,7 +32,7 @@ class _ViewCodePaymentState extends State<ViewCodePayment> {
                 height: size.height * 0.2,
                 decoration: const BoxDecoration(
                     image: DecorationImage(
-                        image: AssetImage('assets/logo_egd.png'),
+                        image: AssetImage('assets/images/logo_planimedic.png'),
                         fit: BoxFit.scaleDown)),
               ),
               const SizedBox(height: 20),
@@ -57,7 +57,7 @@ class _ViewCodePaymentState extends State<ViewCodePayment> {
                               borderRadius: BorderRadius.circular(10)),
                           disabledColor: Colors.grey,
                           elevation: 0,
-                          color: Colors.indigo,
+                          color: Color(0xFF2087C9),
                           child: Container(
                               padding: const EdgeInsets.symmetric(
                                   horizontal: 50, vertical: 15),

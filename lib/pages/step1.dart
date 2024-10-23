@@ -64,7 +64,7 @@ class _Step1ScreenState extends State<Step1Screen> {
           elevation: 0,
           title: Center(
             child: Image.asset(
-              'assets/logo_egd.png',
+              'assets/images/logo_planimedic.png',
               height: 50,
             ),
           ),
@@ -94,7 +94,7 @@ class _Step1ScreenState extends State<Step1Screen> {
                           }
                         : null,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.indigo,
+                      backgroundColor: Color(0xFF2087C9),
                       padding: const EdgeInsets.symmetric(
                           horizontal: 32, vertical: 16),
                       shape: RoundedRectangleBorder(

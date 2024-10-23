@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_videocall/models/providers/doctor_provider.dart';
 
 class LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    //  final doctorCheck = providers.Provider.of<DoctorCheckerProvider>(context,listen: false);
+    // if( doctorCheck.idDoctor == 0 ) return LoadingPage();
     final size = MediaQuery.of(context).size;
     return Scaffold(
       body: Center(
@@ -14,7 +17,7 @@ class LoadingPage extends StatelessWidget {
               height: size.height * 0.2,
               decoration: const BoxDecoration(
                   image: DecorationImage(
-                image: AssetImage('assets/logo_egd.png'),
+                image: AssetImage('assets/images/logo_planimedic.png'),
                 fit: BoxFit.scaleDown,
               )),
             ),
@@ -22,7 +25,7 @@ class LoadingPage extends StatelessWidget {
             const Text('Espere un momento buscando doctor.'),
             const SizedBox(height: 20),
             const CircularProgressIndicator(
-              color: Colors.indigo,
+              color: Color(0xFF2087C9),
             ),
           ],
         ),

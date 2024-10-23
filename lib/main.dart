@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_phoenix/flutter_phoenix.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/config/router/app_router.dart';
 import 'package:flutter_videocall/models/models.dart';
@@ -11,6 +12,8 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(
+    Phoenix(
+      child: 
     ProviderScope(
       child: MultiProvider(
         providers: [
@@ -24,12 +27,14 @@ void main() {
           debugShowCheckedModeBanner: false,
           home: const MainApp(),
           theme: ThemeData(
+            fontFamily: "Canapa",
             colorScheme: ColorScheme.fromSeed(
-              seedColor: Colors.indigo,
+              seedColor: Color(0xFF2087C9),
             ),
           ),
         ),
       ),
+    ),
     ),
   );
 }
@@ -42,6 +47,12 @@ class MainApp extends StatelessWidget {
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
+      theme: ThemeData(
+        fontFamily: "Canapa",
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Color(0xFF2087C9),
+        ),
+      ),
     );
   }
 }

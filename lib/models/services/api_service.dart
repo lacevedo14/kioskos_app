@@ -1,13 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter_videocall/models/entities/entities.dart';
-import 'package:flutter_videocall/models/providers/doctor_provider.dart';
 import 'package:intl/intl.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
-  final String _baseUrl = 'http://192.168.1.6:8000/api';
+  final String _baseUrl = 'https://citamedicas.site/api_kioskos/api';
 
   Future<List<TypeDocuments>> getTypePRovider() async {
     final response = await http.get(Uri.parse('$_baseUrl/document-types'));
@@ -147,10 +145,8 @@ class ApiService {
       if (jsonResponse['doctor_id'] != null) {
         await prefs.setInt('idDoctor', jsonResponse['doctor_id'] as int);
       } else {
-        DoctorCheckerProvider doctorCheck = DoctorCheckerProvider();
-        doctorCheck.startChecking();
+        await prefs.setInt('idDoctor', 0);
       }
-
       return {"success": true, "message": jsonResponse['message']};
     } else {
       return {"success": false, "message": jsonResponse['message']};
@@ -175,7 +171,17 @@ class ApiService {
   }
 
   Future getQuestionsSurvey() async {
-    final response = await http.get(Uri.parse('$_baseUrl/surveys'));
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('tokenGeneral');
+
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+    final response = await http.get(
+      Uri.parse('$_baseUrl/surveys?language=spa'),
+      headers: headers,
+    );
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body);
@@ -192,7 +198,6 @@ class ApiService {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     final idDoctor = prefs.getInt('idDoctor');
     final idAppointment = prefs.getInt('idAppointment');
-    final room = prefs.getString('room');
     final token = prefs.getString('tokenGeneral');
 
     Map<String, String> headers = {
@@ -204,12 +209,13 @@ class ApiService {
         body: jsonEncode({
           "doctor_id": idDoctor.toString(),
           "appointment_id": idAppointment.toString(),
-          "room": room,
-          "connection_quality": data['connection_quality'],
-          "consultation_quality": data['consultation_quality'],
-          "assistance_quality": data['assistance_quality'],
-          "comment": data['comment'],
-          "recommended_doctor": data['recommended_doctor']
+          "responses": [
+            {"survey_id": 1, "response": data['satisfaction']},
+            {"survey_id": 2, "response": data['recommendationAttention']},
+            {"survey_id": 3, "response": data['medicalInformation']},
+            {"survey_id": 4, "response": data['qualityConsultation']},
+            {"survey_id": 5, "response": data['comfortable']},
+          ]
         }));
     final jsonResponse = json.decode(response.body);
 
@@ -217,6 +223,38 @@ class ApiService {
       return {"success": true};
     } else {
       return {"success": false, "message": jsonResponse['message']};
+    }
+  }
+
+  Future getCheckDoctor() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    final room = prefs.getString('room');
+    final token = prefs.getString('tokenGeneral');
+
+    Map<String, String> headers = {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer $token",
+    };
+
+    final response = await http.get(
+      Uri.parse('$_baseUrl/medical-appointments/$room'),
+      headers: headers,
+    );
+    final data = jsonDecode(response.body);
+
+    if (response.statusCode == 200) {
+      if (data[0]['doctor_id'] != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setInt('idDoctor', data[0]['doctor_id'] as int);
+        return {
+          "success": true,
+          "doctor_id": data[0]['doctor_id'] as int,
+        };
+      } else {
+        return {"success": false, "doctor_id": 0};
+      }
+    } else {
+      return {"success": false, "message": data['message']};
     }
   }
 }

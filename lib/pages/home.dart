@@ -18,17 +18,17 @@ class Home extends StatelessWidget {
               height: size.height * 0.2,
               decoration: const BoxDecoration(
                   image: DecorationImage(
-                image: AssetImage('assets/logo_egd.png'),
+                image: AssetImage('assets/images/logo_planimedic.png'),
                 fit: BoxFit.scaleDown,
               )),
             ),
             const SizedBox(height: 20),
             SizedBox(
-              width: size.width * 0.4,
+              width: size.width * 0.5,
               child: ElevatedButton(
                 onPressed: () => context.go('/sign-in'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: Color(0xFF2087C9),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   shape: RoundedRectangleBorder(
@@ -45,11 +45,11 @@ class Home extends StatelessWidget {
             ),
             const SizedBox(height: 20),
             SizedBox(
-              width: size.width * 0.4,
+              width: size.width * 0.5,
               child: ElevatedButton(
                 onPressed: () => context.go('/sign-up'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.indigo,
+                  backgroundColor: Color(0xFF2087C9),
                   padding:
                       const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   shape: RoundedRectangleBorder(

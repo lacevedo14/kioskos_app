@@ -26,7 +26,7 @@ class MeasurementScreen extends StatefulWidget {
 
 class _MeasurementScreenState extends State<MeasurementScreen> {
   String _selectedLanguage = 'ESP';
-    final ApiService _apiService = ApiService(); 
+  final ApiService _apiService = ApiService();
   @override
   void initState() {
     super.initState();
@@ -39,10 +39,14 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
       print('DEBUG: MeasurementScreen: Resultados reiniciados'); // DEBUG
     });
   }
-
+  @override
+  void dispose() {
+    context.read<MeasurementModel>().screenInFocus(false);
+    super.dispose();
+  }
   Future<void> _loadLanguagePreference() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    _selectedLanguage =  prefs.getString('selectedLanguage') ?? 'ESP';
+    _selectedLanguage = prefs.getString('selectedLanguage') ?? 'ESP';
   }
 
   @override
@@ -104,7 +108,7 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Image.asset(
-                      'assets/logo_egd.png',
+                      'assets/images/logo_planimedic.png',
                       height: 35,
                       fit: BoxFit.contain,
                     ),
@@ -136,8 +140,8 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
                     right: 0,
                     child: Container(
                       padding: const EdgeInsets.symmetric(vertical: 5),
-                      color:
-                          const Color.fromARGB(255, 195, 198, 202).withOpacity(0.5),
+                      color: const Color.fromARGB(255, 195, 198, 202)
+                          .withOpacity(0.5),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
@@ -158,7 +162,8 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
     );
   }
 
-  Future<void> showAlert(BuildContext context, String? title, String results) async {
+  Future<void> showAlert(
+      BuildContext context, String? title, String results) async {
     print(
         'DEBUG: MeasurementScreen: showAlert llamado con title="$title" y results="$results"'); // DEBUG
 
@@ -173,17 +178,17 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         {'mainText': mainText, 'subtitleText': subtitleText}
       ];
       print('DEBUG: MeasurementScreen: Parsed Error - $parsedResults'); // DEBUG
-          SchedulerBinding.instance.addPostFrameCallback((_) {
-      print('DEBUG: MeasurementScreen: Navegando a ResultsScreen');
-      //context.go('/entry-page');
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) =>
-              ResultsScreen(results: parsedResults, title: title),
-        ),
-      );
-    });
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        print('DEBUG: MeasurementScreen: Navegando a ResultsScreen');
+        //context.go('/entry-page');
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) =>
+                ResultsScreen(results: parsedResults, title: title),
+          ),
+        );
+      });
     } else {
       parsedResults = results.split('\n').map((line) {
         var parts = line.split(': ');
@@ -192,17 +197,15 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
         }
         return {'mainText': 'N/A', 'subtitleText': parts[0]};
       }).toList();
- 
+
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      var idScan =  prefs.getInt('idScan') ?? '';
-      await _apiService.sendResultScan(idScan,parsedResults); 
-        
+      var idScan = prefs.getInt('idScan') ?? '';
+      await _apiService.sendResultScan(idScan, parsedResults);
+
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        context.go('/entry-page');
-      });// DEBUG
+        context.go('/call-screen');
+      }); // DEBUG
     }
-  
-  
   }
 }
 
@@ -262,12 +265,11 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
   void _stopTimer() {
     if (_timer != null) {
       _timer!.cancel();
-       //setState(() {
-        _isRunning = false;
-        _startTime = 0;
-        print('DEBUG: _StartStopButtonWithTimerState: Timer detenido'); // DEBUG
+      //setState(() {
+      _isRunning = false;
+      _startTime = 0;
+      print('DEBUG: _StartStopButtonWithTimerState: Timer detenido'); // DEBUG
       //});
-     
     }
   }
 
@@ -330,8 +332,8 @@ class _StartStopButtonWithTimerState extends State<_StartStopButtonWithTimer> {
             value: _startTime / _endTime,
             minHeight: 8,
             backgroundColor: Colors.grey[300],
-            valueColor:
-                const AlwaysStoppedAnimation<Color>(Colors.green), // Color verde
+            valueColor: const AlwaysStoppedAnimation<Color>(
+                Colors.green), // Color verde
           ),
         ),
         const SizedBox(height: 10),

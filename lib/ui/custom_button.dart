@@ -29,9 +29,9 @@ class CustomButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return alignment != null
         ? Align(
-      alignment: alignment ?? Alignment.center,
-      child: _buildButtonWidget(),
-    )
+            alignment: alignment ?? Alignment.center,
+            child: _buildButtonWidget(),
+          )
         : _buildButtonWidget();
   }
 
@@ -72,17 +72,18 @@ class CustomButton extends StatelessWidget {
   Color _setColor() {
     switch (variant) {
       case ButtonVariant.FillIndigo50:
-        return Colors.indigo;
+        return Color(0xFF2087C9);
       case ButtonVariant.FillIndigoA700:
-        return Colors.indigo;
+        return Color(0xFF2087C9);
       case ButtonVariant.FillWhiteA700:
         return Colors.white;
       case ButtonVariant.FillGreen50:
         return Colors.green;
-      case ButtonVariant.FillCustomColor: // Nuevo caso para el color personalizado
+      case ButtonVariant
+            .FillCustomColor: // Nuevo caso para el color personalizado
         return const Color(0xFF0D49A1);
       default:
-        return Colors.indigo;
+        return Color(0xFF2087C9);
     }
   }
 
@@ -105,7 +106,7 @@ class CustomButton extends StatelessWidget {
     switch (fontStyle) {
       case ButtonFontStyle.GilroyMedium12:
         return TextStyle(
-          color: Colors.indigo,
+          color: Color(0xFF2087C9),
           fontSize: getFontSize(12),
           fontFamily: 'Gilroy-Medium',
           fontWeight: FontWeight.w500,
@@ -126,7 +127,7 @@ class CustomButton extends StatelessWidget {
         );
       case ButtonFontStyle.GilroyMedium16IndigoA700:
         return TextStyle(
-          color: Colors.indigo,
+          color: Color(0xFF2087C9),
           fontSize: getFontSize(16),
           fontFamily: 'Gilroy-Medium',
           fontWeight: FontWeight.w500,
