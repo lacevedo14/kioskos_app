@@ -27,21 +27,27 @@ class MeasurementScreen extends StatefulWidget {
 class _MeasurementScreenState extends State<MeasurementScreen> {
   String _selectedLanguage = 'ESP';
   final ApiService _apiService = ApiService();
+  MeasurementModel? _measurementModel;
+
   @override
   void initState() {
     super.initState();
-    print('DEBUG: MeasurementScreen: initState llamado'); // DEBUG
     _loadLanguagePreference();
 
     // Reiniciamos los resultados previos al entrar en la pantalla
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<MeasurementModel>().resetResults();
-      print('DEBUG: MeasurementScreen: Resultados reiniciados'); // DEBUG
     });
   }
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    _measurementModel ??= context.read<MeasurementModel>();
+  }
+
+  @override
   void dispose() {
-    context.read<MeasurementModel>().screenInFocus(false);
+    _measurementModel?.screenInFocus(false);
     super.dispose();
   }
   Future<void> _loadLanguagePreference() async {
@@ -58,40 +64,33 @@ class _MeasurementScreenState extends State<MeasurementScreen> {
     var bloodPressure = context
         .select<MeasurementModel, String?>((model) => model.finalResultsString);
 
-    print('DEBUG: MeasurementScreen: build llamado'); // DEBUG
-    print('DEBUG: MeasurementScreen: warning = $warning'); // DEBUG
-    print('DEBUG: MeasurementScreen: error = $error'); // DEBUG
-    print('DEBUG: MeasurementScreen: bloodPressure = $bloodPressure'); // DEBUG
-
     if (warning != null) {
       Fluttertoast.showToast(
           msg: warning,
           toastLength: Toast.LENGTH_SHORT,
           textColor: Colors.white);
-      print('DEBUG: MeasurementScreen: Mostrando toast de warning'); // DEBUG
     }
 
     if (error != null) {
       showAlert(context, "Error", error);
-      print('DEBUG: MeasurementScreen: Mostrando alerta de error'); // DEBUG
     }
 
     if (bloodPressure != null) {
       showAlert(context, "Results", bloodPressure);
-      print(
-          'DEBUG: MeasurementScreen: Mostrando alerta de resultados'); // DEBUG
     }
 
     bool isDark = Theme.of(context).brightness == Brightness.dark;
 
     return FocusDetector(
       onFocusLost: () {
-        print('DEBUG: MeasurementScreen: focus perdido'); // DEBUG
-        context.read<MeasurementModel>().screenInFocus(false);
+        if (mounted) {
+          _measurementModel?.screenInFocus(false);
+        }
       },
       onFocusGained: () {
-        print('DEBUG: MeasurementScreen: focus ganado'); // DEBUG
-        context.read<MeasurementModel>().screenInFocus(true);
+        if (mounted) {
+          _measurementModel?.screenInFocus(true);
+        }
       },
       child: Scaffold(
         backgroundColor: const Color.fromARGB(255, 195, 198, 202),

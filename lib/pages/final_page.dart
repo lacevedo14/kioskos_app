@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:flutter_videocall/main.dart';
 import 'package:flutter_videocall/pages/translations.dart';
 import 'package:go_router/go_router.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -54,7 +54,7 @@ class _FinalPage extends State<FinalPage> {
                   SharedPreferences prefs =
                       await SharedPreferences.getInstance();
                   await prefs.clear();
-                  Phoenix.rebirth(context);
+                  RestartWidget.restartApp(context);
                   context.go('/');
                 },
                 style: ElevatedButton.styleFrom(

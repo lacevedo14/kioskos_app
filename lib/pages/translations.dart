@@ -171,7 +171,7 @@ Map<String, Map<String, String>> translations = {
     'survey': 'Encuesta',
     'generate_code': 'Generar código',
     'medical_prescription':
-        'Podrá pasar por la farmacia a retirar su récipe y su vez recibirá el mismo vía email.',
+        'Podrá pasar por la farmacia a retirar su récipe y a su vez recibirá el mismo vía email.',
     'satisfaction':
         'En una escala del 1 al 5, siendo 1 nada satisfecho y 5 muy satisfecho',
     'satisfaction_attention':

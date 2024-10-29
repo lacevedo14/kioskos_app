@@ -4,6 +4,7 @@ class VideoCall {
   final CallState localVideoInfo ;
   final CallState remoteVideoInfo;
   String? idPatient;
+  String? professionalCard;
   bool audioSetting;
   bool finishCall;
   int idDoctor;
@@ -12,6 +13,7 @@ class VideoCall {
     required this.localVideoInfo,
     required this.remoteVideoInfo,
     this.idPatient,
+    this.professionalCard,
     this.idDoctor = 0,
     this.audioSetting = true,
     this.finishCall = false,
@@ -26,6 +28,7 @@ class VideoCall {
       required CallState localVideoInfo,
       required CallState remoteVideoInfo,
       String? idPatient,
+      String? professionalCard,
       required int idDoctor,
       required bool audioSetting,
       required bool finishCall }) {
@@ -33,6 +36,7 @@ class VideoCall {
       localVideoInfo: localVideoInfo,
       remoteVideoInfo: remoteVideoInfo,
       idPatient: idPatient,
+      professionalCard: professionalCard,
       idDoctor: idDoctor,
       audioSetting: audioSetting,
       finishCall: finishCall,

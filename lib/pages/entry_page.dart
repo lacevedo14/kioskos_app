@@ -28,7 +28,7 @@ class EntryPage extends StatelessWidget {
               ),
               const SizedBox(height: 20),
               Text(
-                'Bienvendio ${patientForm.patient?.patientName}',
+                'Bienvenido ${patientForm.patient?.patientName}',
                 style: Theme.of(context).textTheme.headlineSmall,
               ),
               // const SizedBox(height: 20),

@@ -9,18 +9,38 @@ import 'package:flutter_videocall/models/services/api_service.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:twilio_programmable_video/twilio_programmable_video.dart';
 import 'package:uuid/uuid.dart';
+import 'package:flutter_videocall/utils/math_utils.dart';
 
 final initLocal = CallState(
     isCalling: false,
     id: '',
     widget: const Scaffold(
-        appBar: null, body: Center(child: Text('Sala de Espera'))));
+        appBar: null, body: Center(child: Text('Conectando...'))));
 final initRemote = CallState(
     isCalling: false,
     id: '',
-    widget: const Scaffold(
+    widget: Scaffold(
         appBar: null,
-        body: Center(child: Text('Espere un momento buscando doctor.'))));
+        body: Center(child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Container(
+              height: size.height * 0.1,
+              decoration: const BoxDecoration(
+                  image: DecorationImage(
+                image: AssetImage('assets/images/logo_planimedic.png'),
+                fit: BoxFit.scaleDown,
+              )),
+            ),
+            const SizedBox(height: 20),
+            const Text('Espere un momento buscando doctor.'),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(
+              color: Color(0xFF2087C9),
+            ),
+          ],
+        ))));
 
 class CallStateNotifier extends StateNotifier<VideoCall> {
   CallStateNotifier()
@@ -40,12 +60,14 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   late CameraCapturer _cameraCapturer;
   late Room _room;
   final _remoteParticipantSubscriptions = <StreamSubscription>[];
+  late String newProfecionalCard;
 
   Future<void> initDoctor() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    var doctorId = prefs.getInt('idDoctor') ?? '';
+    var doctorId = prefs.getInt('idDoctor') ?? 0;
+    newProfecionalCard = prefs.getString('professionalCard') ?? '';
     if (doctorId != 0) {
-      updateDoctorId(doctorId as int);
+      updateDoctorId(doctorId);
       initializeWebRtc();
     } else {
       startChecking();
@@ -53,8 +75,8 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
   }
 
   Future<void> initializeWebRtc() async {
-    await TwilioProgrammableVideo.debug(dart: true, native: true);
-    //await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
+    //await TwilioProgrammableVideo.debug(dart: true, native: true);
+    await TwilioProgrammableVideo.requestPermissionForCameraAndMicrophone();
 
     final sources = await CameraSource.getSources();
     _cameraCapturer = CameraCapturer(
@@ -165,6 +187,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
               idDoctor: state.idDoctor,
               localVideoInfo: state.localVideoInfo,
               audioSetting: state.audioSetting,
+              professionalCard: newProfecionalCard,
               finishCall: false,
               remoteVideoInfo: CallState(
                   isCalling: true,
@@ -196,6 +219,7 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
           idDoctor: state.idDoctor,
           localVideoInfo: state.localVideoInfo,
           audioSetting: state.audioSetting,
+          professionalCard: newProfecionalCard,
           finishCall: false,
           remoteVideoInfo: CallState(
               isCalling: true,
@@ -250,14 +274,12 @@ class CallStateNotifier extends StateNotifier<VideoCall> {
       state = state.copyWith(
           localVideoInfo: state.localVideoInfo,
           idDoctor: data['doctor_id'],
+          professionalCard: data['tuition_number'],
           remoteVideoInfo: state.remoteVideoInfo,
           finishCall: false,
           audioSetting: state.audioSetting);
       initializeWebRtc();
-      //nameDoctor = data['nombre'];
-
       timer?.cancel();
-      print('Valor encontrado!');
     }
   }
 

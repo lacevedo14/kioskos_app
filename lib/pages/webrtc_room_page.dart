@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/models/providers/patient_provider.dart';
+import 'package:flutter_videocall/pages/device_info_storage.dart';
 import 'package:flutter_videocall/states/state_providers.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart' as providers;
@@ -42,12 +43,24 @@ class CallScreen extends ConsumerWidget {
           Positioned(
             top: 30,
             left: 10,
-            child: Text(
-              callState.remoteVideoInfo.id,
-              style: const TextStyle(
-                  color: Color.fromARGB(255, 15, 15, 15),
-                  fontSize: 16,
-                  fontWeight: FontWeight.bold),
+            child: Column(
+              children: [
+                Text(
+                  callState.remoteVideoInfo.id,
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 15, 15, 15),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                Text(
+                 callState.professionalCard ?? '',
+                  style: const TextStyle(
+                      color: Color.fromARGB(255, 15, 15, 15),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold),
+                ),
+              ],
             ),
           ),
           Positioned(

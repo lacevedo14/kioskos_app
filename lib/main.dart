@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_phoenix/flutter_phoenix.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_videocall/config/router/app_router.dart';
 import 'package:flutter_videocall/models/models.dart';
@@ -12,7 +12,7 @@ import 'package:provider/provider.dart';
 
 void main() {
   runApp(
-    Phoenix(
+    RestartWidget(
       child: 
     ProviderScope(
       child: MultiProvider(
@@ -45,6 +45,14 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp.router(
+            localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('es'),
+      ],
       debugShowCheckedModeBanner: false,
       routerConfig: appRouter,
       theme: ThemeData(
@@ -53,6 +61,38 @@ class MainApp extends StatelessWidget {
           seedColor: Color(0xFF2087C9),
         ),
       ),
+    );
+  }
+}
+
+class RestartWidget extends StatefulWidget {
+  final Widget child;
+
+  const RestartWidget({Key? key, required this.child}) : super(key: key);
+
+  static void restartApp(BuildContext context) {
+    final _RestartWidgetState? state = context.findAncestorStateOfType<_RestartWidgetState>();
+    state?.restartApp();
+  }
+
+  @override
+  _RestartWidgetState createState() => _RestartWidgetState();
+}
+
+class _RestartWidgetState extends State<RestartWidget> {
+  Key key = UniqueKey();
+
+  void restartApp() {
+    setState(() {
+      key = UniqueKey();  // Esto fuerza la reconstrucción del árbol de widgets
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return KeyedSubtree(
+      key: key,
+      child: widget.child,
     );
   }
 }

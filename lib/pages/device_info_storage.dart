@@ -4,6 +4,7 @@ String scanCode = '';
 String token = '';
 String codePayment = '';
 String tokenGeneral = '';
+String professionalCard = '';
 int idPatient = 0;
 int idDoctor = 0;
 int idAppointment = 0;

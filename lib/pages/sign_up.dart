@@ -69,6 +69,7 @@ class MyCustomFormState extends State<MyCustomForm> {
   final ApiService _apiService = ApiService();
   final TextEditingController _birthDateController = TextEditingController(
       text: DateFormat('yyyy-MM-dd').format(DateTime.now()));
+  bool _esMenorDeEdad = false;
   @override
   void initState() {
     super.initState();
@@ -87,14 +88,26 @@ class MyCustomFormState extends State<MyCustomForm> {
       initialDate: now,
       firstDate: DateTime(1900),
       lastDate: now,
+      locale: const Locale('es'),
     );
     if (picked != null) {
       final String formatted = formatter.format(picked);
       setState(() {
         birthDate = formatted;
         _birthDateController.text = formatted;
+        _esMenorDeEdad = _calcularEdad(picked) < 18;
       });
     }
+  }
+
+  int _calcularEdad(DateTime fechaNacimiento) {
+    final DateTime hoy = DateTime.now();
+    int edad = hoy.year - fechaNacimiento.year;
+    if (hoy.month < fechaNacimiento.month ||
+        (hoy.month == fechaNacimiento.month && hoy.day < fechaNacimiento.day)) {
+      edad--;
+    }
+    return edad;
   }
 
   @override
@@ -288,7 +301,7 @@ class MyCustomFormState extends State<MyCustomForm> {
                   ),
                   const SizedBox(height: 20),
                   TextFormField(
-                    onChanged: (value) => patient.paymentCode = value,
+                    onChanged: (value) => patient.responsible = value,
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Campo requerido';
@@ -300,6 +313,67 @@ class MyCustomFormState extends State<MyCustomForm> {
                       labelText: 'Codigo de Pago',
                     ),
                   ),
+                  if (_esMenorDeEdad) ...[
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      onChanged: (value) => patient.paymentCode = value,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Campo requerido';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecorations.authInputDecoration(
+                        hintText: 'Ingrese el Nombre del Responsable',
+                        labelText: 'Nombre del Responsable',
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    FutureBuilder(
+                      future: codes,
+                      builder: (context, snapshot) {
+                        if (snapshot.hasData) {
+                          return DropdownButtonFormField<String>(
+                            isExpanded: true,
+                            decoration: InputDecorations.authInputDecoration(
+                              hintText: 'Seleccione su Codigo de Telefono',
+                              labelText: 'Codigo de Telefono',
+                            ),
+                            value: null,
+                            items: snapshot.data!.map((value) {
+                              return DropdownMenuItem<String>(
+                                  value: value.codPhone,
+                                  child: Text(
+                                    '${value.codPhone} ${value.description}',
+                                    overflow: TextOverflow.ellipsis,
+                                  ));
+                            }).toList(),
+                            onChanged: (String? value) =>
+                                patient.responsiblePhoneCode = value!,
+                          );
+                        } else if (snapshot.hasError) {
+                          return Text('${snapshot.error}');
+                        }
+                        return const CircularProgressIndicator();
+                      },
+                    ),
+                    const SizedBox(height: 20),
+                    TextFormField(
+                      keyboardType: TextInputType.phone,
+                      onChanged: (value) => patient.responsiblePhone = value,
+                      validator: (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Campo requerido';
+                        }
+                        return null;
+                      },
+                      decoration: InputDecorations.authInputDecoration(
+                        hintText:
+                            'Ingrese su Numero de Teléfono del Responsable',
+                        labelText: 'Numero de Teléfono del Responsable',
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 30),
                   ElevatedButton(
                       onPressed: registerForm.isLoading

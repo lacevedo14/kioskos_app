@@ -171,6 +171,7 @@ class _ResultsScreenState extends State<ResultsScreen> {
                         ElevatedButton(
                           onPressed: () {
                             _sendResults();
+                            context.read<MeasurementModel>().reset();
                             context.go('/call-screen');
                           },
                           style: ElevatedButton.styleFrom(

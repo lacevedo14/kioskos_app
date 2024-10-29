@@ -144,8 +144,10 @@ class ApiService {
       await prefs.setString('token', jsonResponse['token_twilio']);
       if (jsonResponse['doctor_id'] != null) {
         await prefs.setInt('idDoctor', jsonResponse['doctor_id'] as int);
+        await prefs.setString('professionalCard', jsonResponse['doctor_tuition_number']);
       } else {
         await prefs.setInt('idDoctor', 0);
+        await prefs.setString('professionalCard','');
       }
       return {"success": true, "message": jsonResponse['message']};
     } else {
@@ -246,12 +248,14 @@ class ApiService {
       if (data[0]['doctor_id'] != null) {
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setInt('idDoctor', data[0]['doctor_id'] as int);
+        await prefs.setString('professionalCard', data[0]['tuition_number']);
         return {
           "success": true,
           "doctor_id": data[0]['doctor_id'] as int,
+          "tuition_number": data[0]['tuition_number'],
         };
       } else {
-        return {"success": false, "doctor_id": 0};
+        return {"success": false, "doctor_id": 0, "tuition_number": ''};
       }
     } else {
       return {"success": false, "message": data['message']};
